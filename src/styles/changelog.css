@@ -1,0 +1,278 @@
+/* =====================================================================
+ * changelog.css
+ * 更新日志页面 + 按钮红点 - 风格沿袭 chat-settings-page
+ * ===================================================================== */
+
+/* ---------- 设置页按钮红点 ---------- */
+#changelog-open-btn {
+    position: relative;
+    flex-shrink: 0;
+}
+
+#changelog-open-btn.changelog-has-new::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background: #FF3B30;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- 全屏页 ---------- */
+.changelog-page {
+    position: absolute;
+    inset: 0;
+    background: #f5f5f7;
+    z-index: 960;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+.changelog-page.active {
+    display: flex;
+    animation: cl-page-in 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes cl-page-in {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 顶栏 */
+.changelog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: #f5f5f7;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.changelog-back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1D1D1F;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.changelog-back-btn:active {
+    transform: scale(0.95);
+    background: #F4F7F9;
+}
+
+.changelog-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+.changelog-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #5F6B73;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.changelog-spacer {
+    width: 40px;
+    height: 40px;
+}
+
+/* 内容区 */
+.changelog-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 20px 60px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.changelog-empty {
+    text-align: center;
+    color: #9FA6AB;
+    padding: 80px 30px;
+    font-size: 13px;
+}
+
+/* 单个版本条目 */
+.changelog-entry {
+    background: #fff;
+    border-radius: 24px;
+    padding: 22px 22px 18px;
+    margin-bottom: 14px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.changelog-entry::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(69, 73, 77, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.changelog-entry-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(69, 73, 77, 0.08);
+}
+
+.changelog-version {
+    font-size: 18px;
+    font-weight: 700;
+    color: #45494D;
+    letter-spacing: -0.4px;
+}
+
+.changelog-date {
+    font-size: 12px;
+    color: #9FA6AB;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* body 里的自由排版 */
+.changelog-body {
+    font-size: 14px;
+    color: #45494D;
+    line-height: 1.65;
+}
+
+.changelog-body h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5F6B73;
+    margin: 12px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.changelog-body h4:first-child {
+    margin-top: 0;
+}
+
+.changelog-body p {
+    margin: 6px 0;
+}
+
+.changelog-body ul,
+.changelog-body ol {
+    margin: 6px 0;
+    padding-left: 22px;
+}
+
+.changelog-body li {
+    margin: 6px 0;
+    line-height: 1.6;
+}
+
+.changelog-body strong {
+    color: #1D1D1F;
+    font-weight: 600;
+}
+
+.changelog-body em {
+    color: #5F6B73;
+    font-style: normal;
+    background: rgba(69, 73, 77, 0.06);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.changelog-body code {
+    background: rgba(69, 73, 77, 0.08);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: #1D1D1F;
+}
+
+.changelog-body a {
+    color: #007AFF;
+    text-decoration: none;
+}
+
+.changelog-body a:active {
+    opacity: 0.7;
+}
+
+/* ---------- 暗色模式 ---------- */
+.phone-frame.dark-mode .changelog-page,
+.phone-frame.dark-mode .changelog-header {
+    background: #1c1c1e;
+}
+
+.phone-frame.dark-mode .changelog-entry {
+    background: #2c2c2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.phone-frame.dark-mode .changelog-version,
+.phone-frame.dark-mode .changelog-body strong {
+    color: #fff;
+}
+
+.phone-frame.dark-mode .changelog-body {
+    color: #E5E5EA;
+}
+
+.phone-frame.dark-mode .changelog-back-btn {
+    background: #2c2c2e;
+    border-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.phone-frame.dark-mode .changelog-title,
+.phone-frame.dark-mode .changelog-body h4,
+.phone-frame.dark-mode .changelog-date {
+    color: #98989E;
+}
+
+.phone-frame.dark-mode .changelog-entry-head {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.phone-frame.dark-mode .changelog-body em,
+.phone-frame.dark-mode .changelog-body code {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}

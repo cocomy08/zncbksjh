@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safe Area Tuner</title>
+    <style>
+        :root {
+            /* iOS + Tech Color Palette */
+            --bg-color: #F2F2F7; /* iOS System Gray 6 */
+            --card-bg: #FFFFFF;
+            --primary-text: #1C1C1E;
+            --secondary-text: #8E8E93;
+            --accent-color: #007AFF; /* iOS Blue */
+            --accent-gradient: linear-gradient(135deg, #007AFF, #5856D6); /* Blue to Purple - DC/Tech vibe */
+            --danger-color: #FF3B30;
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --shadow-sharp: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --radius-l: 24px;
+            --radius-m: 16px;
+            --radius-s: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 顶部导航栏模拟 */
+        .nav-bar {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .nav-action {
+            font-size: 17px;
+            color: var(--accent-color);
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        /* 主容器 */
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 视觉预览区 - App感的来源 */
+        .preview-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-l);
+            padding: 30px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+        }
+
+        /* 模拟手机屏幕 */
+        .mockup-phone {
+            width: 140px;
+            height: 220px;
+            border: 4px solid #333;
+            border-radius: 20px;
+            position: relative;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Align content to bottom */
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* 模拟App内容 */
+        .mockup-content {
+            flex: 1;
+            background: #f5f5f5;
+            margin: 4px;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 6px;
+        }
+        
+        .skeleton-line { height: 8px; background: #e0e0e0; border-radius: 4px; }
+        .w-80 { width: 80%; }
+        .w-60 { width: 60%; }
+        .w-40 { width: 40%; }
+
+        /* 底部安全区 - 核心交互对象 */
+        .mockup-safe-area {
+            background: rgba(255, 59, 48, 0.15); /* Red tint to show area */
+            border-top: 1px dashed var(--danger-color);
+            height: 20px; /* Default */
+            width: 100%;
+            transition: height 0.1s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mockup-safe-area::after {
+            content: "Safe Area";
+            font-size: 8px;
+            color: var(--danger-color);
+            font-weight: 700;
+        }
+
+        /* 控制面板卡片 */
+        .control-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-l);
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .label-group h2 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .value-badge {
+            font-family: "SF Mono", Menlo, monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-text);
+            background: #F2F2F7;
+            padding: 4px 12px;
+            border-radius: 8px;
+            min-width: 80px;
+            text-align: center;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        /* iOS Style Slider */
+        .slider-wrapper {
+            position: relative;
+            height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            z-index: 2;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        /* Track */
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #E5E5EA;
+            border-radius: 3px;
+        }
+
+        /* Thumb */
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -11px; /* Center */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            transition: transform 0.1s ease;
+        }
+
+        input[type=range]:active::-webkit-slider-thumb {
+            transform: scale(1.1);
+        }
+
+        /* Progress Fill (JS will handle width) */
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 19px; /* (44 - 6)/2 */
+            height: 6px;
+            background: var(--accent-gradient);
+            border-radius: 3px;
+            pointer-events: none;
+            width: 50%;
+            z-index: 1;
+        }
+
+        /* 信息文字区 */
+        .info-text {
+            margin-top: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--secondary-text);
+        }
+
+        .info-highlight {
+            color: var(--primary-text);
+            font-weight: 500;
+        }
+
+        /* 底部按钮 (Action) */
+        .action-button {
+            background: var(--primary-text);
+            color: #fff;
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-m);
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        
+        .action-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Grid Background for "DC/Tech" feel */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#d1d1d6 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+
+    <div class="nav-bar">
+        <div class="nav-action">Cancel</div>
+        <div class="nav-title">Display</div>
+        <div class="nav-action" style="font-weight: 600;">Save</div>
+    </div>
+
+    <div class="container">
+        
+        <!-- 卡片 1: 视觉化反馈 -->
+        <div class="preview-card">
+            <div class="mockup-phone" id="phoneMockup">
+                <div class="mockup-content">
+                    <div class="skeleton-line w-40"></div>
+                    <div class="skeleton-line w-80"></div>
+                    <div class="skeleton-line w-60"></div>
+                    <div style="flex:1"></div> <!-- Spacer -->
+                    <div class="skeleton-line w-80"></div>
+                </div>
+                <!-- 动态变化的安全区 -->
+                <div class="mockup-safe-area" id="mockupSafeArea"></div>
+            </div>
+        </div>
+
+        <!-- 卡片 2: 控制器 -->
+        <div class="control-card">
+            <div class="card-header">
+                <div class="label-group">
+                    <h2>Bottom Inset</h2>
+                </div>
+                <div class="value-badge" id="valueBadge">0px</div>
+            </div>
+
+            <div class="slider-wrapper">
+                <div class="slider-fill" id="sliderFill"></div>
+                <input type="range" id="offsetSlider" min="-100" max="100" value="0">
+            </div>
+
+            <p class="info-text">
+                调整此值以修正 <span class="info-highlight">Home Screen App</span> 模式下的底部黑条或白边。负值会向上收缩，正值会向下延伸。
+            </p>
+        </div>
+
+        <button class="action-button">Reset to Default</button>
+    </div>
+
+    <script>
+        const slider = document.getElementById('offsetSlider');
+        const badge = document.getElementById('valueBadge');
+        const fill = document.getElementById('sliderFill');
+        const mockupArea = document.getElementById('mockupSafeArea');
+        const phoneMockup = document.getElementById('phoneMockup');
+
+        function updateUI() {
+            const val = parseInt(slider.value);
+            
+            // Update Text
+            badge.textContent = `${val > 0 ? '+' : ''}${val}px`;
+            
+            // Update Slider Fill Gradient
+            const percentage = ((val + 100) / 200) * 100;
+            fill.style.width = `${percentage}%`;
+
+            // Update Mockup Visual
+            // Default safe area is roughly 20px in our mockup scale. 
+            // We scale the visual change by 0.5 to keep it looking nice in the small box.
+            const baseHeight = 20;
+            const visualHeight = baseHeight + (val * 0.4); 
+            
+            // Clamp visual height so it doesn't break layout
+            const clampedHeight = Math.max(0, Math.min(visualHeight, 100));
+            mockupArea.style.height = `${clampedHeight}px`;
+
+            // Dynamic Color Logic for "DC/Tech" feel
+            if (val === 0) {
+                badge.style.color = '#1C1C1E';
+                badge.style.background = '#F2F2F7';
+                fill.style.background = 'var(--secondary-text)'; // Neutral when 0
+            } else if (val > 0) {
+                badge.style.color = '#007AFF'; // iOS Blue
+                badge.style.background = 'rgba(0, 122, 255, 0.1)';
+                fill.style.background = 'var(--accent-gradient)';
+            } else {
+                badge.style.color = '#FF3B30'; // Danger/Warning Color
+                badge.style.background = 'rgba(255, 59, 48, 0.1)';
+                fill.style.background = '#FF3B30';
+            }
+
+            // Subtle 3D tilt effect on the phone when sliding fast (simulated by value)
+            if(Math.abs(val) > 80) {
+                phoneMockup.style.transform = `scale(1.02)`;
+            } else {
+                phoneMockup.style.transform = `scale(1)`;
+            }
+        }
+
+        slider.addEventListener('input', updateUI);
+        
+        // Initial call
+        updateUI();
+    </script>
+</body>
+</html>

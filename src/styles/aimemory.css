@@ -1,0 +1,478 @@
+/**
+ * TA的记忆 (AI Memory) 样式
+ * 风格与 chat-settings-page.css 的「月白与青黛」主题完全统一
+ */
+
+/* ========== 全屏覆盖层 ========== */
+#memory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--london-bg, #EAEFF2);
+    z-index: 9999;
+    display: none;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+#memory-overlay.active {
+    display: flex;
+    transform: translateX(0);
+}
+
+#memory-overlay.closing {
+    transform: translateX(100%);
+}
+
+/* ========== 顶部导航 ========== */
+.memory-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: var(--london-bg, #EAEFF2);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.memory-back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.memory-back-btn:active {
+    transform: scale(0.95);
+    background: var(--london-card-alt, #F4F7F9);
+}
+
+.memory-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--london-text-primary, #45494D);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.memory-nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--london-text-secondary, #5F6B73);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.memory-nav-spacer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 40px;
+}
+
+/* ========== 顶栏内联开关（复用 ios-switch 风格）========== */
+.memory-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.memory-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.memory-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--london-card-alt, #F4F7F9);
+    border: 1px solid var(--london-border, rgba(69, 73, 77, 0.12));
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.memory-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background: #fff;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+input:checked + .memory-slider {
+    background: var(--london-accent, #C4A77D);
+    border-color: transparent;
+}
+
+input:checked + .memory-slider:before {
+    transform: translateX(18px);
+}
+
+/* ========== 内容滚动区 ========== */
+#memory-list-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 20px 60px 20px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+#memory-list-container::-webkit-scrollbar { display: none; }
+
+/* ========== 空状态 ========== */
+.memory-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.memory-empty-state svg {
+    width: 56px;
+    height: 56px;
+    stroke: var(--london-text-muted, #9FA6AB);
+    fill: none;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    stroke-width: 1.5;
+}
+
+.memory-empty-state h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--london-text-primary, #45494D);
+    margin: 0 0 8px 0;
+}
+
+.memory-empty-state p {
+    font-size: 13px;
+    color: var(--london-text-muted, #9FA6AB);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ========== 记忆卡片 ========== */
+.memory-card {
+    background: var(--london-card, #FFFFFF);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card, 0 2px 12px rgba(69, 73, 77, 0.06));
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.15s;
+    border: none;
+}
+
+.memory-card:active {
+    transform: scale(0.99);
+}
+
+.memory-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--london-border, rgba(69, 73, 77, 0.08));
+    background: transparent;
+}
+
+.memory-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.memory-card-index {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--london-accent, #C4A77D);
+    background: var(--london-accent-light, rgba(196, 167, 125, 0.1));
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+}
+
+.memory-card-time {
+    font-size: 11px;
+    color: var(--london-text-muted, #9FA6AB);
+}
+
+.memory-edited-badge {
+    font-size: 10px;
+    color: var(--london-text-muted, #9FA6AB);
+    background: var(--london-card-alt, #F4F7F9);
+    border: 1px solid var(--london-border, rgba(69, 73, 77, 0.1));
+    padding: 1px 6px;
+    border-radius: 5px;
+}
+
+.memory-card-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.memory-action-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.memory-action-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--london-text-muted, #9FA6AB);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.memory-edit-btn:active {
+    background: var(--london-accent-light, rgba(196, 167, 125, 0.1));
+}
+
+.memory-edit-btn:active svg {
+    stroke: var(--london-accent, #C4A77D);
+}
+
+.memory-delete-btn:active {
+    background: rgba(212, 165, 165, 0.1);
+}
+
+.memory-delete-btn:active svg {
+    stroke: var(--london-danger, #D4A5A5);
+}
+
+.memory-card-content {
+    padding: 14px 16px;
+}
+
+.memory-item {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--london-text-primary, #45494D);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--london-border, rgba(69, 73, 77, 0.07));
+}
+
+.memory-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.memory-card-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--london-border, rgba(69, 73, 77, 0.07));
+    background: var(--london-card-alt, #F4F7F9);
+    border-radius: 0 0 20px 20px;
+}
+
+.memory-range {
+    font-size: 11px;
+    color: var(--london-text-muted, #9FA6AB);
+}
+
+/* ========== 编辑弹窗 ========== */
+.memory-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(31, 38, 46, 0.42);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10010;
+    padding: 20px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.memory-modal-overlay.active {
+    display: flex;
+}
+
+.memory-modal-content {
+    width: 100%;
+    max-width: 480px;
+    background: var(--london-card, #FFFFFF);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 22px 60px rgba(31, 38, 46, 0.22);
+}
+
+.memory-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--london-border, rgba(69, 73, 77, 0.1));
+}
+
+.memory-modal-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--london-text-primary, #45494D);
+    margin: 0;
+}
+
+.memory-modal-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.memory-modal-close:active {
+    transform: scale(0.92);
+}
+
+.memory-modal-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--london-text-primary, #45494D);
+    fill: none;
+    stroke-width: 2;
+}
+
+.memory-modal-body {
+    padding: 20px;
+}
+
+#memory-edit-textarea {
+    width: 100%;
+    min-height: 200px;
+    background: var(--bg-input, #F5F5F7);
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--london-text-primary, #45494D);
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.2s;
+}
+
+#memory-edit-textarea:focus {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.memory-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 20px 20px;
+}
+
+.memory-modal-btn {
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.2s;
+    font-family: inherit;
+    letter-spacing: 0.2px;
+}
+
+.memory-modal-btn:active {
+    transform: scale(0.97);
+}
+
+.memory-modal-btn.secondary {
+    background: var(--bg-input, #F5F5F7);
+    color: var(--london-text-primary, #45494D);
+}
+
+.memory-modal-btn.primary {
+    background: var(--london-accent, #C4A77D);
+    color: #FFFFFF;
+}
+
+/* ========== Toast提示 ========== */
+.memory-toast {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 10px 20px;
+    background: var(--london-accent, #45494D);
+    color: #fff;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10020;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.memory-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========== 入口按钮（大世界面板中）========== */
+#memory-entry-btn {
+    /* 由 bigworld-entry-btn 样式统一管理，无需重复定义 */
+}

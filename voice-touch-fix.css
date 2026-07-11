@@ -1,0 +1,60 @@
+/* ========================================= */
+/* 修复语音面板按钮触摸穿透问题             */
+/* ========================================= */
+
+/* 
+ * 问题：长按"按住说话"按钮时，弹窗出现瞬间会触发下方的"取消"/"发送"按钮
+ * 原因：触摸事件穿透，手指还在按着时弹窗已经出现
+ * 解决：防止选中、阻止触摸事件传播、添加延迟激活
+ */
+
+/* 1. 防止所有语音相关按钮被选中 */
+#voice-record-button,
+#cancel-voice-input-btn,
+#send-voice-input-btn,
+.voice-panel-button {
+    /* 防止文本选中 */
+    user-select: none !important;
+    -webkit-user-select: none !important; /* Safari */
+    -moz-user-select: none !important;    /* Firefox */
+    -ms-user-select: none !important;     /* IE10+/Edge */
+    
+    /* 防止长按菜单 */
+    -webkit-touch-callout: none !important; /* iOS Safari */
+    
+    /* 防止拖拽 */
+    -webkit-user-drag: none !important;
+}
+
+/* 2. 语音面板初始状态禁用交互（防止穿透） */
+.voice-panel-content {
+    /* 添加短暂延迟，防止弹窗刚出现时接收到触摸事件 */
+    pointer-events: none !important;
+}
+
+/* 3. 显示后启用交互（通过JavaScript添加active类） */
+.voice-panel-content.active {
+    pointer-events: auto !important;
+}
+
+/* 4. 移除按钮的active伪类高亮（防止蓝色选中效果） */
+#voice-record-button:active,
+#cancel-voice-input-btn:active,
+#send-voice-input-btn:active,
+.voice-panel-button:active {
+    /* 移除或自定义active状态 */
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 5. textarea防止选中问题，但允许输入 */
+#voice-transcript-preview {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* 6. 整个语音面板防止触摸传播 */
+.voice-panel-overlay {
+    /* 阻止触摸事件穿透到下方 */
+    touch-action: none !important;
+}

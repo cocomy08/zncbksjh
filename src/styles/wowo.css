@@ -1,0 +1,815 @@
+/* ============================================
+   小窝 (Wowo) - 情侣空间样式
+   ============================================ */
+
+/* --- 0. 颜色变量 --- */
+:root {
+    --wowo-bg: #FDFBF7; /* 暖调米纸色 */
+    --wowo-pink: #FFB7B2;
+    --wowo-green: #E2F0CB;
+    --wowo-purple: #E0BBE4;
+    --wowo-yellow: #FFF9C4;
+    --wowo-text-main: #6D5D6E; /* 柔和紫灰 */
+    --wowo-text-light: #A493A4;
+    --wowo-shadow: 0 4px 20px rgba(100, 80, 100, 0.08);
+    --wowo-font-hand: "Comic Sans MS", "Chalkboard SE", "PingFang SC", sans-serif;
+}
+
+/* --- 1. 主容器 --- */
+#wowo-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--wowo-bg);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#wowo-screen.active {
+    display: flex;
+}
+
+/* --- 2. 顶部返回按钮 --- */
+.wowo-back-btn {
+    position: absolute;
+    top: calc(max(env(safe-area-inset-top), 16px) + 10px);
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 110;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.wowo-back-btn:active {
+    transform: scale(0.95);
+}
+
+.wowo-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--wowo-text-main);
+}
+
+/* --- 3. 底部悬浮导航 (胶囊形状) --- */
+.wowo-tab-bar {
+    position: fixed;
+    bottom: max(env(safe-area-inset-bottom) + 10px, 20px);
+    left: 20px;
+    right: 20px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+
+.wowo-tab-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0.9);
+    cursor: pointer;
+    padding: 10px 0;
+    height: 100%;
+}
+
+.wowo-tab-item.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.wowo-tab-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--wowo-text-main);
+    display: block;
+}
+
+/* --- 4. 页面容器 --- */
+.wowo-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 24px 24px 100px 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    padding-top:50px;
+}
+
+.wowo-page.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.wowo-page::-webkit-scrollbar {
+    display: none;
+}
+
+.wowo-page-title {
+    font-family: var(--wowo-font-hand);
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--wowo-text-main);
+    margin: 60px 0 30px 0;
+}
+
+/* ============ Page 1: 纪念日 (极简海报) ============ */
+#wowo-page-love {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, #FFF0F5 0%, transparent 40%);
+    padding-top: 0;
+}
+
+.wowo-love-card {
+    text-align: center;
+    position: relative;
+}
+
+.wowo-days-big {
+    font-size: 100px;
+    font-weight: 800;
+    color: var(--wowo-pink);
+    line-height: 0.9;
+    letter-spacing: -4px;
+    text-shadow: 4px 4px 0px #FFF;
+}
+
+.wowo-days-label {
+    font-family: var(--wowo-font-hand);
+    font-size: 18px;
+    margin-top: 10px;
+    background: #FFF;
+    padding: 4px 12px;
+    border-radius: 12px;
+    transform: rotate(-2deg);
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: var(--wowo-text-main);
+}
+
+.wowo-love-separator {
+    margin: 30px auto;
+    display: block;
+}
+
+.wowo-date-edit-hint {
+    font-size: 12px;
+    color: var(--wowo-text-light);
+    margin-top: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.wowo-date-edit-hint:hover {
+    color: var(--wowo-text-main);
+}
+
+/* ============ Page 2: 生理期 (柔软Blob) ============ */
+.wowo-cycle-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.wowo-blob-bg {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: #FFE4E1;
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    animation: wowoMorph 6s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes wowoMorph {
+    0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+    50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1.05); }
+}
+
+.wowo-cycle-content {
+    z-index: 1;
+    text-align: center;
+}
+
+.wowo-cycle-day {
+    font-size: 48px;
+    font-weight: bold;
+    color: #D86B6B;
+}
+
+.wowo-cycle-status {
+    font-size: 14px;
+    color: #BC8F8F;
+    margin-top: 4px;
+}
+
+/* 经期预测卡片 */
+.wowo-cycle-prediction {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 25px; /* 增加底部间距 */
+    font-size: 14px;
+    color: #666;
+}
+
+.wowo-cycle-prediction-title {
+    font-size: 12px;
+    color: var(--wowo-text-light);
+    margin-bottom: 12px;
+}
+
+.wowo-cycle-prediction-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #EEE;
+}
+
+.wowo-cycle-prediction-row:last-child {
+    border-bottom: none;
+}
+
+.wowo-cycle-prediction-label {
+    font-size: 14px;
+    color: var(--wowo-text-main);
+}
+
+.wowo-cycle-prediction-value {
+    font-size: 14px;
+    color: var(--wowo-pink);
+    font-weight: bold;
+}
+
+/* 经期日期选择器容器 */
+
+
+/* 经期日期按钮外观 */
+.wowo-date-btn {
+    font-size: 12px;
+    background: #FFF;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    color: #999;
+    white-space: nowrap;
+}
+/* Input样式已移至HTML行内以确保优先级 */
+
+.wowo-btn-soft {
+    width: 100%;
+    background: #FFF;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 16px;
+    color: var(--wowo-text-main);
+    box-shadow: var(--wowo-shadow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.1s;
+    
+}
+
+.wowo-btn-soft:active {
+    transform: scale(0.98);
+}
+
+/* ============ Page 3: 打卡日记 (交换日记本) ============ */
+.wowo-journal-card {
+    background: #FFF;
+    border-radius: 2px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 24px;
+    position: relative;
+    background-image: linear-gradient(#F5F5F5 1px, transparent 1px);
+    background-size: 100% 40px;
+}
+
+.wowo-journal-card::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 20px;
+    background: #E0E0E0;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.wowo-question-text {
+    font-family: var(--wowo-font-hand);
+    font-size: 18px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.wowo-journal-input {
+    width: 100%;
+    height: 120px;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 16px;
+    line-height: 40px;
+    color: var(--wowo-text-main);
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.wowo-mood-section {
+    margin-top: 20px;
+    border-top: 2px dashed #EEE;
+    padding-top: 20px;
+}
+
+.wowo-mood-title {
+    font-size: 12px;
+    color: #AAA;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.wowo-mood-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.wowo-mood-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.wowo-mood-opt.selected {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.wowo-mood-svg {
+    width: 40px;
+    height: 40px;
+}
+
+.wowo-btn-post {
+    background: #fffdfd;
+    color: #ffb2b2;
+    width: 100%;
+    padding: 15px;
+    border-radius: 50px;
+    border: 1px solid #fff5f5;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    /* box-shadow: 0 5px 15px rgba(109, 93, 110, 0.3); */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.wowo-btn-post:active {
+    transform: scale(0.98);
+}
+
+.wowo-btn-post:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.wowo-btn-post.loading {
+    pointer-events: none;
+}
+
+/* 加载动画 */
+.wowo-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #FFF;
+    border-radius: 50%;
+    animation: wowoSpin 0.8s linear infinite;
+}
+
+@keyframes wowoSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* 已打卡提示 */
+.wowo-journal-done-hint {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: var(--wowo-text-light);
+}
+
+/* 打卡历史区域 */
+.wowo-journal-history {
+    margin-top: 30px;
+}
+
+.wowo-journal-history-title {
+    font-size: 14px;
+    color: var(--wowo-text-light);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wowo-journal-history-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.wowo-journal-history-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* 打卡历史便签卡片 */
+.wowo-journal-history-card {
+    flex-shrink: 0;
+    width: 140px;
+    min-height: 100px;
+    padding: 16px;
+    background: #FFF;
+    border-radius: 4px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.05);
+    font-family: var(--wowo-font-hand);
+    font-size: 12px;
+    color: #555;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.wowo-journal-history-card:active {
+    transform: scale(0.98);
+}
+
+.wowo-journal-history-card .wowo-tape {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 30px;
+    height: 10px;
+}
+
+.wowo-journal-history-date {
+    font-size: 10px;
+    color: var(--wowo-text-light);
+    margin-bottom: 8px;
+}
+
+.wowo-journal-history-preview {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+/* ============ Page 4: 小声贴 (Washi Tape 瀑布流) ============ */
+.wowo-waterfall {
+    columns: 2;
+    column-gap: 15px;
+}
+
+.wowo-sticky-note {
+    break-inside: avoid;
+    margin-bottom: 20px;
+    padding: 20px 15px 30px 15px;
+    background: #FFF;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.05);
+    font-family: var(--wowo-font-hand);
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+    color: #555;
+}
+
+.wowo-tape {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1deg);
+    width: 40px;
+    height: 12px;
+    background-color: rgba(224, 187, 228, 0.6);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.wowo-sticky-note:nth-child(2n) .wowo-tape {
+    background-color: rgba(226, 240, 203, 0.7);
+    transform: translateX(-50%) rotate(2deg);
+}
+
+.wowo-sticky-note:nth-child(3n) .wowo-tape {
+    background-color: rgba(255, 183, 178, 0.7);
+}
+
+.wowo-sticky-note:nth-child(odd) {
+    transform: rotate(-1deg);
+}
+
+.wowo-sticky-note:nth-child(even) {
+    transform: rotate(1deg);
+}
+
+/* 小声贴作者标签 */
+.wowo-sticky-note-author {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 10px;
+    color: var(--wowo-text-light);
+    font-style: italic;
+}
+
+.wowo-sticky-note-author.is-ai {
+    color: var(--wowo-pink);
+}
+
+.wowo-fab {
+    position: fixed;
+    bottom: 120px;
+    right: 24px;
+    width: 50px;
+    height: 50px;
+    background: #FFF;
+    border-radius: 50%;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--wowo-text-main);
+    border: 2px solid #F0F0F0;
+    cursor: pointer;
+    z-index: 101;
+    transition: transform 0.2s;
+}
+
+.wowo-fab:active {
+    transform: scale(0.95);
+}
+
+/* ============ 通用弹窗 ============ */
+.wowo-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+}
+
+.wowo-mask.show {
+    display: flex;
+    animation: wowoFade 0.3s;
+}
+
+@keyframes wowoFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.wowo-sheet {
+    width: 100%;
+    background: #FFF;
+    padding: 30px;
+    padding-bottom: max(30px, env(safe-area-inset-bottom));
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+    animation: wowoSlide 0.3s;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+@keyframes wowoSlide {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.wowo-sheet h3 {
+    margin-top: 0;
+    color: var(--wowo-text-main);
+}
+
+.wowo-pill-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.wowo-pill {
+    padding: 8px 18px;
+    border: 1px solid #EEE;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #888;
+    background: #FFF;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.wowo-pill.active {
+    background: var(--wowo-pink);
+    color: #FFF;
+    border-color: var(--wowo-pink);
+}
+
+/* ============ 纪念日设置弹窗 ============ */
+.wowo-anniversary-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #EEE;
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--wowo-text-main);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+.wowo-anniversary-input:focus {
+    outline: none;
+    border-color: var(--wowo-pink);
+}
+
+/* ============ 日记详情弹窗 ============ */
+.wowo-journal-detail {
+    background: #FDFBF7;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.wowo-journal-detail-question {
+    font-family: var(--wowo-font-hand);
+    font-size: 16px;
+    color: var(--wowo-text-main);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #DDD;
+}
+
+.wowo-journal-detail-answer {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.wowo-journal-detail-ai {
+    background: linear-gradient(135deg, rgba(255,183,178,0.1) 0%, rgba(224,187,228,0.1) 100%);
+    padding: 15px;
+    border-radius: 12px;
+    
+}
+
+.wowo-journal-detail-ai-label {
+    font-size: 11px;
+    color: var(--wowo-pink);
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.wowo-journal-detail-ai-content {
+    font-size: 14px;
+    color: var(--wowo-text-main);
+    line-height: 1.6;
+    max-height: 30vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+/* === Fix: Content Scrolling & Centering === */
+.wow-content-area {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+    width: 100%;
+    position: relative;
+}
+
+.wow-profile-avatar-large {
+    display: block;
+    margin: 0 auto;
+    width: 80px; /* Default size if not specified */
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* iOS PWA 滚动修复：生理期历史列表 */
+#wowo-cycle-history-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+/* ============ WOW (朋友圈/动态) 修复样式 ============ */
+/* Fix: 详情页默认必须隐藏，否则会覆盖身份选择弹窗 */
+.wow-detail-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f7f7f7;
+    z-index: 1200;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+.wow-detail-view.show {
+    display: flex !important;
+}
+
+/* 身份选择弹窗样式增强 */
+.wow-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1300; /* 确保在最上层 */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+

@@ -1,0 +1,1117 @@
+/* =====================================================================
+ * user-profiles.css
+ * UI for user persona switcher.
+ * 风格延续 chat-settings-page.css ：月白与青黛 / 陶瓷质感。
+ * ===================================================================== */
+
+/* ---------- 通用 ---------- */
+.up-hidden {
+    display: none !important;
+}
+
+#messages-screen .up-hidden-header {
+    display: none !important;
+}
+
+#messages-screen .messages-content.up-hidden {
+    display: none !important;
+}
+
+/* ---------- 底栏 segment 拓展为三段 ---------- */
+.glass-segment-control.up-3-segments {
+    width: 260px;
+}
+
+.glass-segment-control.up-3-segments .segment-indicator {
+    width: calc(33.3333% - 4px) !important;
+    transform: translateX(0);
+}
+
+.glass-segment-control.up-3-segments.group-mode .segment-indicator {
+    transform: translateX(100%) !important;
+}
+
+.glass-segment-control.up-3-segments.user-mode .segment-indicator {
+    transform: translateX(200%) !important;
+}
+
+.glass-segment-control.up-3-segments.user-mode .segment-btn[data-type="single"],
+.glass-segment-control.up-3-segments.user-mode .segment-btn[data-type="group"] {
+    color: #8e8e93;
+    font-weight: 500;
+}
+
+/* ===================================================================
+ * 「我的人设」列表页 - 仿 chat-settings-page
+ * =================================================================== */
+.up-profiles-screen {
+    position: absolute;
+    inset: 0;
+    background: #f5f5f7;
+    z-index: 10;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+.up-profiles-screen.show {
+    display: flex;
+    animation: upPageSlideIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes upPageSlideIn {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 顶栏 - 复用 settings-page-header 视觉 */
+.up-profiles-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: #f5f5f7;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.up-profiles-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #5F6B73;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.up-profiles-add-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1D1D1F;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.up-profiles-add-btn:active {
+    transform: scale(0.95);
+    background: #F4F7F9;
+}
+
+.up-profiles-add-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+/* 内容区 */
+.up-profiles-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 20px 110px 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 顶部默认人设卡片 */
+.up-profiles-default-card {
+    background: #fff;
+    border-radius: 32px;
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.up-profiles-default-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(69, 73, 77, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.up-default-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    background-size: cover;
+    background-position: center;
+    background-color: #eee;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    border: 3px solid #fff;
+    flex-shrink: 0;
+}
+
+.up-default-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-default-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9FA6AB;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.up-default-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #45494D;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.up-default-persona {
+    font-size: 12px;
+    color: #9FA6AB;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+/* 列表分组标题 */
+.up-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9FA6AB;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 8px 12px;
+}
+
+/* 列表项卡片 */
+.up-profiles-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.up-profile-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: #fff;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+    border: 1px solid transparent;
+}
+
+.up-profile-item:active {
+    transform: scale(0.985);
+    background: #F4F7F9;
+}
+
+.up-profile-item.is-default {
+    border-color: rgba(69, 73, 77, 0.18);
+}
+
+.up-profile-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background-size: cover;
+    background-position: center;
+    background-color: #F4F7F9;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(69, 73, 77, 0.06);
+}
+
+.up-profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.up-profile-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #45494D;
+    letter-spacing: -0.1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.up-profile-badge {
+    font-size: 10px;
+    color: #fff;
+    background: #45494D;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.up-profile-persona {
+    font-size: 12px;
+    color: #9FA6AB;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.up-profile-action {
+    border: none;
+    background: transparent;
+    color: #9FA6AB;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.up-profile-action:active {
+    background: rgba(69, 73, 77, 0.06);
+}
+
+.up-profiles-empty {
+    text-align: center;
+    color: #9FA6AB;
+    font-size: 13px;
+    padding: 80px 30px;
+    line-height: 1.6;
+}
+
+/* ===================================================================
+ * 上下文菜单（更多操作）
+ * =================================================================== */
+.up-action-menu {
+    position: fixed;
+    z-index: 99999;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(69, 73, 77, 0.18);
+    overflow: hidden;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(69, 73, 77, 0.06);
+    animation: upMenuIn 0.18s ease-out;
+}
+
+@keyframes upMenuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.up-action-menu button {
+    border: none;
+    background: #fff;
+    padding: 13px 18px;
+    text-align: left;
+    font-size: 14px;
+    color: #45494D;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(69, 73, 77, 0.06);
+    font-family: inherit;
+    transition: background 0.12s;
+}
+
+.up-action-menu button:last-child {
+    border-bottom: none;
+}
+
+.up-action-menu button:active {
+    background: #F4F7F9;
+}
+
+.up-action-menu button:disabled {
+    color: #C7C7CC;
+    cursor: not-allowed;
+}
+
+.up-action-menu button.danger {
+    color: #C48888;
+}
+
+/* ===================================================================
+ * 编辑人设 全屏页（替代弹窗，仿 chat-settings-page 风格）
+ * =================================================================== */
+.up-editor-page {
+    position: absolute;
+    inset: 0;
+    background: #f5f5f7;
+    z-index: 950;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+.up-editor-page.show {
+    display: flex;
+    animation: upPageSlideIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.up-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: #f5f5f7;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.up-editor-back-btn,
+.up-editor-save-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1D1D1F;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.up-editor-back-btn:active,
+.up-editor-save-btn:active {
+    transform: scale(0.95);
+    background: #F4F7F9;
+}
+
+.up-editor-back-btn svg,
+.up-editor-save-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+.up-editor-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #5F6B73;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* 内容滚动区 */
+.up-editor-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 20px 50px 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 头像卡片 */
+.up-editor-avatar-card {
+    background: #fff;
+    border-radius: 32px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.up-editor-avatar-card::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.up-editor-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 32px;
+    background-size: cover;
+    background-position: center;
+    background-color: #eee;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border: 4px solid #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.up-editor-avatar-btn {
+    padding: 10px 22px;
+    background: #45494D;
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+    z-index: 1;
+    position: relative;
+}
+
+.up-editor-avatar-btn:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+}
+
+/* 表单区 */
+.up-editor-form {
+    background: #fff;
+    border-radius: 24px;
+    padding: 8px 20px;
+    margin-top: 16px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.up-editor-field {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(69, 73, 77, 0.08);
+}
+
+.up-editor-field:last-child {
+    border-bottom: none;
+}
+
+.up-editor-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9FA6AB;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.up-editor-field input,
+.up-editor-field textarea {
+    width: 100%;
+    background: #F5F5F7;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1D1D1F;
+    font-family: inherit;
+    outline: none;
+    transition: 0.2s;
+    box-sizing: border-box;
+}
+
+.up-editor-field input:focus,
+.up-editor-field textarea:focus {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.up-editor-field input::placeholder,
+.up-editor-field textarea::placeholder {
+    color: #9FA6AB;
+}
+
+.up-editor-field textarea {
+    resize: none;
+    min-height: 110px;
+    line-height: 1.5;
+}
+
+/* 删除按钮（编辑现有时显示） */
+.up-editor-delete-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 24px;
+    border: none;
+    background: rgba(212, 165, 165, 0.15);
+    color: #C48888;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+}
+
+.up-editor-delete-btn:active {
+    background: rgba(212, 165, 165, 0.25);
+    transform: scale(0.99);
+}
+
+/* ===================================================================
+ * 聊天设置：单 tab 紧凑样式 + user picker 长条
+ * =================================================================== */
+
+/* 单聊设置页：隐藏角色名一行（picker + tab 已经能展示信息） */
+#chat-settings-page .profile-name-row {
+    display: none !important;
+}
+
+/* 单聊设置页：紧凑化头卡，去掉过大的内边距 */
+#chat-settings-page .profile-header-card {
+    padding: 20px 20px 18px;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+
+#chat-settings-page .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    border-width: 3px;
+}
+
+#chat-settings-page .profile-avatar-badge {
+    width: 22px;
+    height: 22px;
+    bottom: -4px;
+    right: -4px;
+}
+
+#chat-settings-page .profile-avatar-badge svg {
+    width: 11px;
+    height: 11px;
+}
+
+#chat-settings-page .profile-info {
+    margin: 0;
+    padding: 0;
+}
+
+/* role-tabs-wrapper 单 tab 居中显示 */
+#chat-settings-page .role-tabs-wrapper.up-single-tab {
+    display: none;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0 !important;
+}
+
+#chat-settings-page .role-tabs-wrapper.up-single-tab .role-tab-btn {
+    flex: 0 0 auto;
+    min-width: 96px;
+    text-align: center;
+}
+
+.up-chat-user-picker {
+    margin-top: 16px;
+    margin-bottom: 4px;
+    background: #fff;
+    border: 1px solid rgba(69, 73, 77, 0.08);
+    border-radius: 24px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.up-chat-user-picker:active {
+    background: #F4F7F9;
+    transform: scale(0.99);
+}
+
+.up-picker-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+    background-color: #F4F7F9;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(69, 73, 77, 0.06);
+}
+
+.up-picker-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-picker-label {
+    font-size: 10px;
+    color: #9FA6AB;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 2px;
+    font-weight: 600;
+}
+
+.up-picker-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #45494D;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: -0.1px;
+}
+
+.up-picker-chevron {
+    color: #C7C7CC;
+    flex-shrink: 0;
+}
+
+/* ===================================================================
+ * 选择器 bottom-sheet
+ * =================================================================== */
+.up-picker-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    display: none;
+}
+
+.up-picker-sheet.show {
+    display: block;
+}
+
+.up-picker-sheet-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(69, 73, 77, 0.45);
+    animation: upMaskIn 0.2s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+@keyframes upMaskIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.up-picker-sheet-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f5f5f7;
+    border-radius: 24px 24px 0 0;
+    max-height: 72vh;
+    display: flex;
+    flex-direction: column;
+    animation: upSheetIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    box-shadow: 0 -8px 32px rgba(69, 73, 77, 0.18);
+}
+
+@keyframes upSheetIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.up-picker-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(69, 73, 77, 0.18);
+    border-radius: 2px;
+    margin: 10px auto 0;
+}
+
+.up-picker-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 12px;
+}
+
+.up-picker-sheet-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #5F6B73;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.up-picker-sheet-close {
+    border: none;
+    background: transparent;
+    color: #45494D;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 12px;
+    transition: background 0.15s;
+}
+
+.up-picker-sheet-close:active {
+    background: rgba(69, 73, 77, 0.08);
+}
+
+.up-picker-sheet-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px 16px 8px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.up-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.02),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.up-picker-row:active {
+    background: #F4F7F9;
+    transform: scale(0.99);
+}
+
+.up-picker-row.selected {
+    border-color: #45494D;
+    background: rgba(69, 73, 77, 0.04);
+}
+
+.up-picker-row-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+    background-color: #F4F7F9;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(69, 73, 77, 0.06);
+}
+
+.up-picker-row-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-picker-row-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #45494D;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    letter-spacing: -0.1px;
+}
+
+.up-picker-row-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.up-picker-row-badge {
+    font-size: 9px;
+    color: #fff;
+    background: #45494D;
+    padding: 2px 7px;
+    border-radius: 7px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.up-picker-row-persona {
+    font-size: 12px;
+    color: #9FA6AB;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.up-picker-row-check {
+    width: 22px;
+    height: 22px;
+    color: #45494D;
+    display: none;
+    flex-shrink: 0;
+}
+
+.up-picker-row.selected .up-picker-row-check {
+    display: block;
+}
+
+.up-picker-sheet-add {
+    margin: 8px 16px 16px;
+    padding: 14px;
+    border-radius: 20px;
+    border: 1.5px dashed rgba(69, 73, 77, 0.25);
+    background: transparent;
+    color: #45494D;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+}
+
+.up-picker-sheet-add:active {
+    background: rgba(69, 73, 77, 0.04);
+    border-color: rgba(69, 73, 77, 0.4);
+}
+
+/* ===================================================================
+ * add-contact-modal: 新建角色 - 用户提示卡 + 紧凑头部
+ * =================================================================== */
+
+/* 紧凑 header：取消 role-switcher 后的居中标题 */
+#add-contact-modal .modal-header.up-modal-header-compact {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px;
+    position: relative !important;
+    background: #fff;
+    border-bottom: 1px solid rgba(69, 73, 77, 0.08);
+}
+
+/* 强制隐藏内部已被替换的 role-switcher（含 checkbox / switch-label） */
+#add-contact-modal .modal-header.up-modal-header-compact .role-switcher {
+    display: none !important;
+}
+
+#add-contact-modal .up-modal-header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1D1D1F;
+    letter-spacing: -0.2px;
+}
+
+/* 关闭按钮维持原右侧绝对定位 */
+#add-contact-modal .modal-header.up-modal-header-compact .modal-close-button {
+    right: 12px;
+}
+
+/* 输入框：强化对比度，让背景与 modal 白底分得清 */
+#add-contact-modal .form-input,
+#add-contact-modal .form-textarea {
+    background: #f5f5f7 !important;
+
+    text-align: left !important;
+    font-weight: 500 !important;
+    color: #1D1D1F !important;
+    padding: 14px 16px !important;
+}
+
+#add-contact-modal .form-input:focus,
+#add-contact-modal .form-textarea:focus {
+    background: #fff !important;
+    border-color: rgba(0, 122, 255, 0.4) !important;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.08) !important;
+}
+
+#add-contact-modal .form-input::placeholder,
+#add-contact-modal .form-textarea::placeholder {
+    color: #9FA6AB !important;
+    font-weight: 400 !important;
+}
+
+/* 一行紧凑提示卡 */
+.up-user-hint-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 12px;
+    background: rgba(69, 73, 77, 0.05);
+    border-radius: 12px;
+    color: #5F6B73;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.up-user-hint-icon {
+    width: 14px;
+    height: 14px;
+    color: #5F6B73;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.up-user-hint-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.up-user-hint-text strong {
+    color: #45494D;
+    font-weight: 600;
+}
+
+/* ===================================================================
+ * 暗色模式
+ * =================================================================== */
+.phone-frame.dark-mode .up-profiles-screen,
+.phone-frame.dark-mode .up-editor-page,
+.phone-frame.dark-mode .up-picker-sheet-content {
+    background: #1c1c1e;
+}
+
+.phone-frame.dark-mode .up-profiles-header,
+.phone-frame.dark-mode .up-editor-header {
+    background: #1c1c1e;
+}
+
+.phone-frame.dark-mode .up-profile-item,
+.phone-frame.dark-mode .up-profiles-default-card,
+.phone-frame.dark-mode .up-editor-avatar-card,
+.phone-frame.dark-mode .up-editor-form,
+.phone-frame.dark-mode .up-picker-row,
+.phone-frame.dark-mode .up-action-menu,
+.phone-frame.dark-mode .up-chat-user-picker,
+.phone-frame.dark-mode .up-action-menu button {
+    background: #2c2c2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.phone-frame.dark-mode .up-profile-name,
+.phone-frame.dark-mode .up-default-name,
+.phone-frame.dark-mode .up-picker-name,
+.phone-frame.dark-mode .up-picker-row-name,
+.phone-frame.dark-mode .up-picker-sheet-close {
+    color: #fff;
+}
+
+.phone-frame.dark-mode .up-profiles-title,
+.phone-frame.dark-mode .up-editor-title,
+.phone-frame.dark-mode .up-picker-sheet-title {
+    color: #98989E;
+}
+
+.phone-frame.dark-mode .up-action-menu button {
+    color: #fff;
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.phone-frame.dark-mode .up-action-menu button:active,
+.phone-frame.dark-mode .up-profile-item:active,
+.phone-frame.dark-mode .up-picker-row:active,
+.phone-frame.dark-mode .up-chat-user-picker:active {
+    background: #3a3a3c;
+}
+
+.phone-frame.dark-mode .up-editor-field input,
+.phone-frame.dark-mode .up-editor-field textarea {
+    background: #1c1c1e;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.phone-frame.dark-mode .up-editor-field input:focus,
+.phone-frame.dark-mode .up-editor-field textarea:focus {
+    background: #1c1c1e;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.phone-frame.dark-mode .up-picker-row.selected {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.phone-frame.dark-mode .up-profiles-add-btn,
+.phone-frame.dark-mode .up-editor-back-btn,
+.phone-frame.dark-mode .up-editor-save-btn {
+    background: #2c2c2e;
+    border-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.phone-frame.dark-mode .up-user-hint-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #98989E;
+}
+
+.phone-frame.dark-mode .up-user-hint-text strong {
+    color: #fff;
+}
+

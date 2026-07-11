@@ -1,0 +1,1114 @@
+/* ==========================================================
+   聊天设置独立页面样式 - 月白与青黛 / Moon White & Indigo Grey
+   高级克制风格 (Advanced & Restrained) - 去iOS化，去暖色调
+   ========================================================== */
+
+/* CSS变量：月白与青黛调色板 (冷淡、高级、克制) */
+:root {
+    /* 页面背景：通透的月白灰，不使用磨砂，使用实色或高以太 */
+    --london-bg: #EAEFF2; 
+    
+    /* 卡片背景：极高明度的冷白 */
+    --london-card: #FFFFFF;
+    
+    /* 次级背景：淡淡的月白，用于输入框或次级区域 */
+    --london-card-alt: #F4F7F9;
+    
+    /* 文本色体系：青黛为主 */
+    --london-text-primary: #45494D; /* 青黛：视觉重心 */
+    --london-text-secondary: #5F6B73; /* 灰蓝：次要信息 */
+    --london-text-muted: #9FA6AB; /* 更淡的灰色 */
+    
+    /* 强调色：直接使用青黛色，表达克制 */
+    --london-accent: #45494D; 
+    
+    /* 强调色（浅）：月白色的变体 */
+    --london-accent-light: rgba(69, 73, 77, 0.08);
+    
+    /* 边框：极细微的冷灰 */
+    --london-border: rgba(69, 73, 77, 0.12);
+    
+    /* 阴影：不再使用弥散阴影，改用克制的低透明度黑/蓝灰 */
+    --london-shadow: 0 4px 12px rgba(69, 73, 77, 0.08); /* 极克制 */
+    --london-shadow-soft: 0 2px 6px rgba(69, 73, 77, 0.04);
+    
+    /* 功能色 */
+    --london-danger: #D4A5A5; /* 保持低饱和 */
+    --london-danger-dark: #C48888;
+    --london-success: #8FB3C4; /* 冷调绿/蓝 */
+    --bg-body: #F4F4F6;
+            --bg-card: #FFFFFF;
+            --bg-input: #F5F5F7;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            
+            --accent-brand: #000000;
+            --accent-blue: #007AFF;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            
+            /* 陶瓷质感阴影 */
+            --shadow-card: 
+                0 2px 8px rgba(0,0,0,0.02),
+                0 8px 24px rgba(0,0,0,0.04),
+                0 0 0 1px rgba(0,0,0,0.02);
+            
+            --ease-spring: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* 1. 页面容器基础样式 */
+.chat-settings-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #f5f5f7;
+    z-index: 900;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    
+    /* 确保没有残留的背景图 */
+    background-image: none;
+}
+
+.chat-settings-page.active {
+    display: flex;
+    animation: pageSlideIn 0.3s cubic-bezier(0.2, 0, 0, 1); /* 更干脆的动画 */
+}
+
+@keyframes pageSlideIn {
+    from {
+        transform: translateX(30px); /* 减小位移幅度，更稳重 */
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pageSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(30px);
+        opacity: 0;
+    }
+}
+
+.chat-settings-page.closing {
+    animation: pageSlideOut 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* 2. 顶部导航栏 - 极简风格 */
+.settings-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: #f5f5f7;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.settings-page-back-btn {
+   width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0;
+}
+
+.settings-page-back-btn:active {
+    transform: scale(0.95);
+    background: var(--london-card-alt);
+}
+
+.settings-page-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+.settings-page-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--london-text-secondary);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.settings-page-header-right {
+    width: 40px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 保存按钮特殊样式 */
+.settings-page-save-btn {
+    width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0;
+}
+
+.settings-page-save-btn:active {
+    transform: scale(0.95);
+    background: var(--london-accent);
+}
+
+.settings-page-save-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+/* 3. 滚动内容区域 */
+.settings-page-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 20px 50px 20px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+}
+
+/* Centering for empty states */
+#theme-presets-empty, #bubble-presets-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; /* Ensure vertical space for centering */
+}
+
+/* 4. 头部卡片 - 高级质感 */
+.profile-header-card {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 装饰性背景光 */
+        .profile-header-card::before {
+            content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+.profile-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+ width: 100px; height: 100px;
+            border-radius: 32px; /* Squircle */
+            background: #eee;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            border: 4px solid #fff;
+            transition: transform 0.3s var(--ease-spring);
+}
+
+.profile-avatar:active {
+    transform: scale(0.96);
+}
+
+/* ================= Forms & Inputs ================= */
+        .settings-input-field, .settings-textarea-field {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 15px; font-weight: 500; color: var(--text-primary);
+            font-family: inherit;
+            outline: none; transition: 0.2s;
+        }
+        .settings-input-field:focus, .settings-textarea-field:focus {
+            background: #fff; border-color: rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .settings-textarea-field { resize: none; line-height: 1.5; }
+
+.profile-avatar-badge {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    background: var(--london-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(196, 167, 125, 0.4);
+    border: 2px solid var(--london-card);
+}
+
+.profile-avatar-badge svg {
+    width: 13px;
+    height: 13px;
+    stroke: #fff;
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--london-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    letter-spacing: -0.3px;
+    margin-left:30%;
+}
+
+.profile-edit-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+
+.profile-edit-btn:active {
+    opacity: 0.8;
+}
+
+.profile-edit-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--london-text-primary);
+}
+
+.profile-subtitle {
+    font-size: 13px;
+    color: var(--london-text-muted);
+    letter-spacing: 0.2px;
+}
+
+/* 5. 成员区域卡片 */
+.members-section-card {
+    background: var(--bg-card);
+    border-radius: 32px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid transparent;
+    margin-top:16px;
+}
+
+.members-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.members-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--london-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.members-section-count {
+    font-size: 12px;
+    color: var(--london-accent);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.members-grid-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.member-avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 58px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.member-avatar-item:active {
+    transform: scale(0.95);
+}
+
+.member-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--london-card-alt);
+    box-shadow: var(--london-shadow-soft);
+}
+
+.member-avatar-name {
+    font-size: 10px;
+    color: var(--london-text-secondary);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 58px;
+}
+
+.member-add-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--london-card-alt);
+    border: 1.5px dashed var(--london-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--london-text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-add-btn:hover {
+    background: var(--london-accent-light);
+    border-color: var(--london-accent);
+    color: var(--london-accent);
+}
+
+.my-card-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    /* background: linear-gradient(135deg, var(--london-accent-light), var(--london-card)); */
+    border-radius: 32px;
+    margin-top: 16px;
+    cursor: pointer;
+    border: 1px solid rgba(196, 167, 125, 0.15);
+}
+
+.my-card-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--london-card-alt);
+    border: 2px solid var(--london-accent);
+}
+
+.my-card-info {
+    flex: 1;
+}
+
+.my-card-label {
+    font-size: 10px;
+    color: var(--london-text-muted);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.my-card-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--london-text-primary);
+}
+
+/* 6. 可折叠设置分组 - 优雅卡片 */
+.collapsible-section {
+    background: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            transition: all 0.3s var(--ease-spring);
+    margin-bottom: 16px;
+    margin-top:16px;
+}
+
+.collapsible-section.expanded {
+    box-shadow: var(--london-shadow);
+}
+
+.collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    user-select: none;
+}
+
+.collapsible-header:active {
+    background-color: var(--london-card-alt);
+}
+
+.collapsible-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.collapsible-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collapsible-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--london-text-secondary); /* 图标颜色改为次级文本色 */
+}
+
+/* 优雅单色图标背景 - 克制风格 */
+.collapsible-icon.worldbook {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-icon.display {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-icon.background {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-icon.danger {
+    background: rgba(212, 165, 165, 0.1);
+    color: var(--london-danger);
+}
+
+.collapsible-icon.character {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-icon.style {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-icon.other {
+    background: rgba(69, 73, 77, 0.05);
+    color: var(--london-text-primary);
+}
+
+.collapsible-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--london-text-primary);
+    letter-spacing: 0.1px;
+}
+
+.collapsible-chevron {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.3;
+    stroke: var(--london-text-primary);
+}
+
+.collapsible-section.expanded .collapsible-chevron {
+    transform: rotate(180deg);
+    opacity: 0.5;
+}
+
+.collapsible-content {
+    /* 性能优化：使用 Grid 动画核心 */
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    will-change: grid-template-rows;
+    /* 容器只负责高度收缩，不负责透明度 */
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsible-section.expanded .collapsible-content {
+    grid-template-rows: 1fr;
+}
+
+.collapsible-inner {
+    min-height: 0;
+    /* 核心修复：收起时垂直内边距为0，彻底消除"白块"占位 */
+    padding: 0 20px; 
+    
+    margin: 0;
+    
+    /* 同步过渡内边距和透明度 */
+    transition: padding 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsible-section.expanded .collapsible-inner {
+    /* 展开时恢复原有的内边距 */
+    padding: 4px 20px 24px 20px;
+    opacity: 1;
+}
+
+/* 7. 设置项 */
+.setting-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--london-border);
+}
+
+.setting-item-row:last-child {
+    border-bottom: none;
+}
+
+.setting-item-label {
+    font-size: 14px;
+    color: var(--london-text-primary);
+    letter-spacing: 0.1px;
+}
+
+.setting-item-value {
+    font-size: 14px;
+    color: var(--london-text-muted);
+}
+
+/* 8. 开关控件 - 温暖风格 */
+.ios-switch {
+    position: relative;
+    width: 50px;
+    height: 30px;
+    background: var(--london-card-alt);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+    border: 1px solid var(--london-border);
+}
+
+.ios-switch.active {
+    background: var(--london-accent);
+    border-color: transparent;
+}
+
+.ios-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ios-switch.active::after {
+    transform: translateX(20px);
+}
+
+/* 9. 输入框样式 - 修复溢出问题 */
+.settings-input-field {
+    width: 100%;
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 15px; font-weight: 500; color: var(--text-primary);
+            font-family: inherit;
+            outline: none; transition: 0.2s;
+    box-sizing: border-box; /* 关键：修复溢出 */
+}
+
+.settings-input-field:focus {
+    outline: none;
+    background: #fff; border-color: rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.settings-input-field::placeholder {
+    color: var(--london-text-muted);
+}
+
+.settings-textarea-field {
+     width: 100%;
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 15px; font-weight: 500; color: var(--text-primary);
+            font-family: inherit;
+            outline: none; transition: 0.2s;
+    box-sizing: border-box; /* 关键：修复溢出 */
+}
+
+.settings-textarea-field:focus {
+    outline: none;
+    background: #fff; border-color: rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.settings-textarea-field::placeholder {
+    color: var(--london-text-muted);
+}
+
+/* 10. 背景选择器 */
+.bg-selector-wrapper {
+    margin-top: 8px;
+}
+
+.bg-preview-box {
+    width: 100%;
+    height: 140px;
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+    /* background-color: var(--london-card-alt); */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1.5px dashed var(--london-text-muted);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-preview-box.has-bg {
+    border: none;
+}
+
+.bg-preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--london-text-muted);
+    font-size: 13px;
+}
+
+.bg-preview-placeholder svg {
+    width: 28px;
+    height: 28px;
+    opacity: 0.4;
+}
+
+.bg-action-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.bg-action-btn {
+    flex: 1;
+    padding: 13px;
+    border-radius: 16px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+}
+
+.bg-action-btn.primary {
+    background: var(--london-accent);
+    color: #fff;
+   
+}
+
+.bg-action-btn.primary:active {
+    background: rgba(196, 167, 125, 0.3);
+    transform: scale(0.98);
+}
+
+.bg-action-btn.secondary {
+  background: var(--bg-input);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            outline: none; transition: 0.2s;
+}
+
+.bg-action-btn.secondary:active {
+    background: #fff; border-color: rgba(0,0,0,0.1);
+}
+
+/* 11. 危险按钮区域 */
+.danger-actions-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.danger-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+}
+
+.danger-btn.red {
+    background: rgba(212, 165, 165, 0.15);
+    color: var(--london-danger-dark);
+}
+
+.danger-btn.red:active {
+    background: rgba(212, 165, 165, 0.25);
+}
+
+.danger-btn.purple {
+    background: rgba(184, 167, 196, 0.15);
+    color: #9B89A8;
+}
+
+.danger-btn.purple:active {
+    background: rgba(184, 167, 196, 0.25);
+}
+
+
+/* 13. 角色信息编辑区 */
+.character-form-section {
+    margin-bottom: 16px;
+}
+
+.character-form-row {
+    margin-bottom: 18px;
+}
+
+.character-form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--london-text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.character-avatar-editor {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.character-avatar-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--london-card-alt);
+    box-shadow: var(--london-shadow-soft);
+}
+
+.character-avatar-upload-btn {
+    padding: 12px 20px;
+    background: var(--london-accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(196, 167, 125, 0.3);
+    letter-spacing: 0.2px;
+}
+
+.character-avatar-upload-btn:active {
+    background: #B89A6E;
+    transform: scale(0.98);
+}
+
+/* 14. 角色/用户切换标签 */
+.role-tabs-wrapper {
+    display: flex;
+    background: var(--bg-input);
+    border-radius: 100px;
+    padding: 3px;
+}
+
+.role-tab-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--london-text-muted);
+    border-radius: 80px;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.2px;
+}
+
+.role-tab-btn.active {
+    background: var(--london-card);
+    color: var(--london-text-primary);
+    box-shadow: var(--london-shadow-soft);
+}
+
+/* 15. 气泡样式预设选择器 */
+.bubble-style-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bubble-style-option {
+    padding: 12px 20px;
+    border: 1.5px solid var(--london-border);
+    border-radius: 12px;
+    background: var(--london-card);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--london-text-secondary);
+}
+
+.bubble-style-option.selected {
+    border-color: var(--london-accent);
+    background: var(--london-accent-light);
+    color: var(--london-accent);
+}
+
+/* ==========================================================
+   World Book Selector Beautification (London Afternoon Style)
+   ========================================================== */
+.worldbook-multiselect-wrapper {
+    max-height: 400px !important;
+    background: transparent !important;
+    border: none !important;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.wb-group-card {
+    background: var(--london-card-alt);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid var(--london-border);
+    transition: all 0.2s ease;
+}
+
+.wb-group-card.expanded {
+    background: var(--london-card);
+    box-shadow: var(--london-shadow-soft);
+    border-color: var(--london-accent);
+}
+
+.wb-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.wb-group-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.wb-group-icon {
+    width: 32px;
+    height: 32px;
+    background: #E8DDD0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C4A77D;
+    flex-shrink: 0;
+}
+
+.wb-group-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--london-text-primary);
+}
+
+.wb-group-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wb-select-all-btn {
+    font-size: 11px;
+    color: var(--london-accent);
+    background: rgba(196, 167, 125, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.wb-select-all-btn:active {
+    background: var(--london-accent);
+    color: #fff;
+    transform: scale(0.95);
+}
+
+.wb-expand-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--london-text-muted);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wb-group-card.expanded .wb-expand-icon {
+    transform: rotate(180deg);
+    color: var(--london-accent);
+}
+
+.wb-group-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
+}
+
+.wb-group-card.expanded .wb-group-content {
+    max-height: 1000px;
+    padding-bottom: 8px;
+}
+
+.wb-item-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin: 4px 8px;
+    border-radius: 12px;
+}
+
+.wb-item-row:active {
+    background: rgba(0,0,0,0.03);
+}
+
+/* Custom Checkbox */
+.wb-checkbox-custom {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 2px solid #E0E0E0;
+    margin-right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.wb-item-row.selected .wb-checkbox-custom {
+    background: var(--london-accent);
+    border-color: var(--london-accent);
+    transform: scale(1.05);
+}
+
+.wb-checkbox-custom svg {
+    width: 14px;
+    height: 14px;
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    transition: stroke-dashoffset 0.3s ease;
+    fill: none;
+}
+
+.wb-item-row.selected .wb-checkbox-custom svg {
+    stroke-dashoffset: 0;
+}
+
+.wb-item-name {
+    font-size: 14px;
+    color: var(--london-text-secondary);
+    flex: 1;
+    font-weight: 400;
+}
+
+.wb-item-row.selected .wb-item-name {
+    color: var(--london-text-primary);
+    font-weight: 500;
+}
+

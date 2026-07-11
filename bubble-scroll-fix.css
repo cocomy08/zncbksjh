@@ -1,0 +1,60 @@
+/* === 气泡预设列表滚动修复 (iOS/Android 增强版) === */
+
+/* 
+ * 核心修复：#bubble-preset-select-list 必须自身作为滚动容器，
+ * 因为 iOS PWA 触摸锁定护盾的白名单只认这个 ID。
+ * 如果滚动属性放在匿名父 div 上，护盾会 preventDefault 掉触摸事件。
+ */
+#bubble-preset-select-list {
+  display: block;
+  width: 100%;
+  
+  /* 限制高度，使内容溢出时触发滚动 */
+  max-height: 50vh;
+  
+  /* 滚动行为 */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  
+  /* iOS Safari 惯性滚动支持 */
+  -webkit-overflow-scrolling: touch !important;
+  
+  /* 防止滚动穿透 */
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
+  
+  /* 触摸操作：允许纵向拖拽 */
+  touch-action: pan-y;
+  
+  /* 确保内边距合适 */
+  padding-bottom: 20px;
+  
+  /* 滚动条占位，防止内容跳动 */
+  scrollbar-gutter: stable;
+}
+
+/* 气泡预设列表项 - 确保可点击且不干扰滚动 */
+#bubble-preset-select-list > * {
+  touch-action: manipulation;
+}
+
+/* === 群聊成员选择容器滚动修复 === */
+#group-member-select-container {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  max-height: 60vh;
+}
+
+#group-member-list {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  max-height: 50vh;
+}
+
+#group-member-list .contact-item {
+  touch-action: manipulation;
+}

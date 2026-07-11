@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WorldBook - Ceramic Edition</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ================= 核心设计语言 ================= */
+        :root {
+            --bg-body: #F2F2F7;
+            --bg-card: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --accent-brand: #000000; /* 极致黑作为主色，更显高端 */
+            --accent-blue: #007AFF;
+            --danger: #FF3B30;
+            
+            /* 陶瓷悬浮质感阴影 */
+            --shadow-card: 
+                0 4px 20px -8px rgba(0,0,0,0.06),
+                0 0 0 1px rgba(0,0,0,0.03);
+            
+            /* 悬浮岛/模态框的高级阴影 */
+            --shadow-float: 
+                0 24px 48px -12px rgba(0,0,0,0.18),
+                0 0 0 1px rgba(255,255,255,0.6) inset;
+
+            --radius-l: 32px;
+            --radius-m: 20px;
+            --radius-s: 14px;
+            
+            --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            height: 100vh; overflow: hidden; margin: 0;
+            display: flex; justify-content: center;
+            /* 注入噪点纹理增加纸张感 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        .device-frame {
+            width: 100%; max-width: 440px; height: 100%; 
+            position: relative; display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 隐藏滚动条 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* ================= 视图层级管理 ================= */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none; transform: scale(0.96);
+            transition: opacity 0.4s ease, transform 0.4s var(--ease-ios);
+            padding-bottom: 100px; /* 为底部导航留空 */
+        }
+        .screen.active {
+            opacity: 1; pointer-events: auto; transform: scale(1); z-index: 10;
+        }
+
+        /* ================= Header (沉浸式大标题) ================= */
+        .header {
+            padding: 60px 24px 16px; /* 适配灵动岛 50px + */
+            display: flex; justify-content: space-between; align-items: flex-end;
+            background: linear-gradient(to bottom, rgba(242,242,247,0.9) 0%, rgba(242,242,247,0) 100%);
+            z-index: 20; position: relative;
+        }
+        .header-title-block h1 {
+            font-size: 34px; font-weight: 800; letter-spacing: -0.03em; margin: 0;
+            background: linear-gradient(180deg, #1D1D1F 0%, #444 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header-subtitle {
+            font-size: 13px; font-weight: 600; text-transform: uppercase; 
+            letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 4px;
+        }
+        
+        .header-actions { display: flex; gap: 12px; }
+        .icon-btn {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary); cursor: pointer; transition: 0.2s;
+        }
+        .icon-btn:active { transform: scale(0.92); background: #fff; }
+        .icon-btn.active { background: var(--text-primary); color: #fff; }
+
+        /* ================= 列表容器 ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 10px 24px;
+            scroll-behavior: smooth;
+        }
+
+        /* ================= 书籍卡片 (Library) ================= */
+        .book-card {
+            background: var(--bg-card); border-radius: var(--radius-m);
+            padding: 16px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: var(--shadow-card);
+            transition: all 0.3s var(--ease-ios);
+            position: relative; overflow: hidden;
+        }
+        .book-card:active { transform: scale(0.98); }
+        
+        /* 书籍图标/封面容器 */
+        .book-icon-box {
+            width: 56px; height: 72px; border-radius: 8px;
+            background: linear-gradient(135deg, #E0E0E0 0%, #F5F5F7 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0; color: #999;
+        }
+
+        .book-info { flex: 1; }
+        .book-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+        .book-meta { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .tag { background: #F2F2F7; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #666; }
+
+        /* 选择模式下的 Checkbox */
+        .check-circle {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #D1D1D6;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; margin-left: 8px;
+            opacity: 0; width: 0; margin-left: 0; /* 默认隐藏 */
+        }
+        /* 激活选择模式 */
+        .mode-select .check-circle { opacity: 1; width: 24px; margin-left: 12px; }
+        .book-card.selected { background: #F0F8FF; box-shadow: 0 0 0 2px var(--accent-blue) inset; }
+        .book-card.selected .check-circle { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+
+        /* ================= 分组卡片 (Bento Grid) ================= */
+        .grid-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        }
+        .group-card {
+            background: var(--bg-card); border-radius: var(--radius-l);
+            padding: 24px; height: 160px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: var(--shadow-card);
+            position: relative; transition: 0.3s;
+        }
+        .group-card:active { transform: scale(0.96); }
+        
+        .group-icon {
+            width: 48px; height: 48px; border-radius: 16px;
+            background: #F5F5F7; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: var(--text-primary);
+        }
+        .group-stats { text-align: right; }
+        .group-count { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+        .group-label { font-size: 14px; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+
+        /* 特殊样式的卡片 */
+        .group-card.dark { background: #1D1D1F; color: #fff; }
+        .group-card.dark .group-icon { background: rgba(255,255,255,0.15); color: #fff; }
+        .group-card.dark .group-label { color: rgba(255,255,255,0.6); }
+
+        .add-group-card {
+            border: 2px dashed #D1D1D6; box-shadow: none; background: transparent;
+            align-items: center; justify-content: center; color: #D1D1D6;
+        }
+
+        /* ================= 底部悬浮导航 (Dock) ================= */
+        .dock-container {
+            position: absolute; bottom: 34px; width: 100%;
+            display: flex; justify-content: center; z-index: 100;
+            pointer-events: none; /* 让点击穿透空白区域 */
+        }
+        
+        .glass-dock {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 6px; border-radius: 100px;
+            display: flex; gap: 8px;
+            box-shadow: var(--shadow-float);
+            transition: transform 0.3s var(--ease-ios);
+        }
+        /* 编辑模式下隐藏 Dock */
+        .mode-select .dock-container { transform: translateY(150%); }
+
+        .dock-btn {
+            width: 100px; height: 48px; border-radius: 100px;
+            border: none; background: transparent;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 14px; font-weight: 600; color: var(--text-secondary);
+            cursor: pointer; transition: 0.3s;
+        }
+        .dock-btn.active { background: #FFFFFF; color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .dock-btn i { width: 20px; height: 20px; }
+
+        /* ================= 编辑模式底部操作栏 ================= */
+        .edit-bar {
+            position: absolute; bottom: 34px; left: 24px; right: 24px;
+            background: #1D1D1F; color: #fff;
+            padding: 16px 24px; border-radius: 100px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transform: translateY(200%); transition: transform 0.4s var(--ease-ios);
+            z-index: 101;
+        }
+        .mode-select .edit-bar { transform: translateY(0); }
+        .edit-info { font-size: 14px; font-weight: 600; }
+        .edit-actions { display: flex; gap: 16px; }
+        .edit-icon-btn { color: #fff; background: rgba(255,255,255,0.15); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; }
+        .edit-icon-btn.danger { background: rgba(255, 59, 48, 0.2); color: #FF3B30; }
+
+        /* ================= 移动分组抽屉 (Action Sheet) ================= */
+        .sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200;
+            display: flex; align-items: flex-end;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .sheet-content {
+            width: 100%; max-height: 80vh; background: #fff;
+            border-top-left-radius: 32px; border-top-right-radius: 32px;
+            padding: 24px; transform: translateY(100%); transition: transform 0.4s var(--ease-ios);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+        .sheet-overlay.open .sheet-content { transform: translateY(0); }
+
+        .sheet-header { text-align: center; margin-bottom: 24px; position: relative; }
+        .sheet-handle { width: 40px; height: 5px; background: #E5E5EA; border-radius: 3px; margin: 0 auto 16px; }
+        .sheet-title { font-size: 18px; font-weight: 700; }
+
+        .group-select-list { display: flex; flex-direction: column; gap: 12px; }
+        .group-option {
+            padding: 16px; background: #F9F9FB; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; transition: 0.2s;
+        }
+        .group-option:active { background: #E5E5EA; transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div class="device-frame">
+        
+        <div id="screen-library" class="screen active">
+            <div class="header">
+                <div class="header-title-block">
+                    <div class="header-subtitle">Your Collection</div>
+                    <h1>WorldBook</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="btn-select-mode">
+                        <i data-lucide="list-checks"></i>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-scroll no-scrollbar" id="book-list-container">
+                </div>
+        </div>
+
+        <div id="screen-groups" class="screen">
+            <div class="header">
+                <div class="header-title-block">
+                    <div class="header-subtitle">Categorized</div>
+                    <h1>Groups</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn">
+                        <i data-lucide="plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-scroll no-scrollbar">
+                <div class="grid-container">
+                    <div class="group-card dark">
+                        <div class="group-icon"><i data-lucide="feather"></i></div>
+                        <div class="group-stats">
+                            <div class="group-count">12</div>
+                            <div class="group-label">Philosophy</div>
+                        </div>
+                    </div>
+                    <div class="group-card">
+                        <div class="group-icon"><i data-lucide="rocket"></i></div>
+                        <div class="group-stats">
+                            <div class="group-count">8</div>
+                            <div class="group-label">Sci-Fi</div>
+                        </div>
+                    </div>
+                    <div class="group-card">
+                        <div class="group-icon"><i data-lucide="palette"></i></div>
+                        <div class="group-stats">
+                            <div class="group-count">24</div>
+                            <div class="group-label">Design</div>
+                        </div>
+                    </div>
+                    <div class="group-card add-group-card">
+                        <i data-lucide="plus" size="32"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dock-container">
+            <div class="glass-dock">
+                <button class="dock-btn active" onclick="switchTab('library')">
+                    <i data-lucide="book"></i> Books
+                </button>
+                <div style="width:1px; height:24px; background:rgba(0,0,0,0.1); margin:0 4px;"></div>
+                <button class="dock-btn" onclick="switchTab('groups')">
+                    <i data-lucide="grid"></i> Groups
+                </button>
+            </div>
+        </div>
+
+        <div class="edit-bar" id="edit-bar">
+            <div class="edit-info"><span id="selected-count">0</span> Selected</div>
+            <div class="edit-actions">
+                <button class="edit-icon-btn danger"><i data-lucide="trash-2" size="18"></i></button>
+                <button class="edit-icon-btn" onclick="openMoveSheet()"><i data-lucide="folder-input" size="18"></i></button>
+                <button class="edit-icon-btn" onclick="exitSelectMode()"><i data-lucide="x" size="18"></i></button>
+            </div>
+        </div>
+
+        <div class="sheet-overlay" id="move-sheet" onclick="if(event.target===this) closeMoveSheet()">
+            <div class="sheet-content">
+                <div class="sheet-header">
+                    <div class="sheet-handle"></div>
+                    <div class="sheet-title">Move to Group</div>
+                </div>
+                <div class="group-select-list">
+                    <div class="group-option" onclick="closeMoveSheet()">
+                        <span>Philosophy</span>
+                        <i data-lucide="chevron-right" size="16" color="#C7C7CC"></i>
+                    </div>
+                    <div class="group-option" onclick="closeMoveSheet()">
+                        <span>Sci-Fi</span>
+                        <i data-lucide="chevron-right" size="16" color="#C7C7CC"></i>
+                    </div>
+                    <div class="group-option" onclick="closeMoveSheet()">
+                        <span>Design</span>
+                        <i data-lucide="chevron-right" size="16" color="#C7C7CC"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 模拟数据
+        const books = [
+            { title: "The Design of Everyday Things", author: "Don Norman", tag: "Design" },
+            { title: "Sapiens: A Brief History", author: "Yuval Noah Harari", tag: "History" },
+            { title: "Dune", author: "Frank Herbert", tag: "Sci-Fi" },
+            { title: "Atomic Habits", author: "James Clear", tag: "Self-help" },
+            { title: "Steve Jobs", author: "Walter Isaacson", tag: "Bio" },
+            { title: "Clean Code", author: "Robert C. Martin", tag: "Tech" },
+        ];
+
+        // 渲染书籍列表
+        const listContainer = document.getElementById('book-list-container');
+        books.forEach((book, index) => {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.onclick = () => toggleSelection(card);
+            card.innerHTML = `
+                <div class="book-icon-box">
+                    <i data-lucide="book-open" stroke-width="1.5"></i>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-meta">
+                        <span>${book.author}</span>
+                        <span style="margin:0 6px">•</span>
+                        <span class="tag">${book.tag}</span>
+                    </div>
+                </div>
+                <div class="check-circle"><i data-lucide="check" size="14" stroke-width="3"></i></div>
+            `;
+            listContainer.appendChild(card);
+        });
+        lucide.createIcons();
+
+        // 交互逻辑
+        let isSelectMode = false;
+        let selectedCount = 0;
+
+        // 切换 Tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+            
+            if(tabName === 'library') {
+                document.getElementById('screen-library').classList.add('active');
+                document.querySelectorAll('.dock-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('screen-groups').classList.add('active');
+                document.querySelectorAll('.dock-btn')[1].classList.add('active');
+            }
+        }
+
+        // 进入/退出 选择模式
+        document.getElementById('btn-select-mode').onclick = () => {
+            isSelectMode = true;
+            document.body.classList.add('mode-select');
+        };
+
+        function exitSelectMode() {
+            isSelectMode = false;
+            document.body.classList.remove('mode-select');
+            document.querySelectorAll('.book-card').forEach(c => c.classList.remove('selected'));
+            selectedCount = 0;
+            updateCount();
+        }
+
+        // 选择单个卡片
+        function toggleSelection(card) {
+            if (!isSelectMode) return;
+            
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                selectedCount--;
+            } else {
+                card.classList.add('selected');
+                selectedCount++;
+            }
+            updateCount();
+        }
+
+        function updateCount() {
+            document.getElementById('selected-count').innerText = selectedCount;
+        }
+
+        // 模态框逻辑
+        function openMoveSheet() {
+            if (selectedCount === 0) return alert('请先选择书籍');
+            document.getElementById('move-sheet').classList.add('open');
+        }
+        function closeMoveSheet() {
+            document.getElementById('move-sheet').classList.remove('open');
+            // 模拟操作完成后退出选择模式
+            setTimeout(exitSelectMode, 300);
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+/* ==========================================================
+   近7天日程 (7-Day Schedule) 全屏覆盖层样式
+   配色沿用 chat-settings-page.css 的「月白与青黛」调色板
+   ========================================================== */
+
+/* 1. 全屏覆盖层 */
+#schedule-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--london-bg, #EAEFF2);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    will-change: transform;
+}
+
+#schedule-overlay.active {
+    transform: translateX(0);
+}
+
+/* 2. 顶部导航 */
+.schedule-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 20px 16px 20px;
+    background: var(--london-bg, #EAEFF2);
+    border-bottom: none;
+    min-height: 54px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.schedule-back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.schedule-back-btn:active {
+    transform: scale(0.95);
+    background: var(--london-card-alt, #F4F7F9);
+}
+
+.schedule-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--london-text-primary, #45494D);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.schedule-nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--london-text-secondary, #5F6B73);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.schedule-nav-right {
+    width: 40px;
+    flex-shrink: 0;
+}
+
+/* 3. 内容区 */
+.schedule-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 16px 100px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 4. 设置卡片 */
+.schedule-settings-card {
+    background: var(--london-card, #FFFFFF);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.schedule-setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.schedule-setting-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.schedule-setting-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--london-text-primary, #45494D);
+}
+
+.schedule-setting-hint {
+    font-size: 12px;
+    color: var(--london-text-muted, #9FA6AB);
+    line-height: 1.4;
+}
+
+/* 5. 开关 */
+.schedule-switch {
+    position: relative;
+    width: 50px;
+    height: 30px;
+    background: var(--london-card-alt, #F4F7F9);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+    border: 1px solid var(--london-border, rgba(69, 73, 77, 0.12));
+}
+
+.schedule-switch.active {
+    background: var(--london-accent, #45494D);
+    border-color: transparent;
+}
+
+.schedule-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.schedule-switch.active::after {
+    transform: translateX(20px);
+}
+
+/* 6. 操作按钮区 */
+.schedule-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.schedule-btn {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.2s;
+    font-family: inherit;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.schedule-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.schedule-btn-primary {
+    background: var(--london-accent, #45494D);
+    color: #fff;
+}
+
+.schedule-btn-primary:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+}
+
+.schedule-btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.schedule-btn-secondary {
+    background: var(--london-card, #FFFFFF);
+    color: var(--london-text-primary, #45494D);
+    border: 1px solid var(--london-border, rgba(69, 73, 77, 0.12));
+}
+
+.schedule-btn-secondary:active {
+    transform: scale(0.97);
+    background: var(--london-card-alt, #F4F7F9);
+}
+
+/* 7. 日程分组 - 按天 */
+.schedule-day-group {
+    margin-bottom: 16px;
+}
+
+.schedule-day-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0 8px;
+}
+
+.schedule-day-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--london-text-primary, #45494D);
+}
+
+.schedule-day-weekday {
+    font-size: 12px;
+    color: var(--london-text-muted, #9FA6AB);
+    font-weight: 400;
+}
+
+.schedule-day-badge-today {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(214, 51, 108, 0.1);
+    color: #d6336c;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.schedule-day-badge-past {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--london-card-alt, #F4F7F9);
+    color: var(--london-text-muted, #9FA6AB);
+    font-weight: 500;
+}
+
+/* 8. 日程项卡片 */
+.schedule-item-card {
+    background: var(--london-card, #FFFFFF);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: opacity 0.2s;
+    position: relative;
+}
+
+.schedule-item-card.past {
+    opacity: 0.55;
+}
+
+.schedule-item-time-col {
+    flex-shrink: 0;
+    width: 52px;
+    text-align: center;
+}
+
+.schedule-item-time {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--london-text-primary, #45494D);
+    font-variant-numeric: tabular-nums;
+}
+
+.schedule-item-period {
+    font-size: 10px;
+    color: var(--london-text-muted, #9FA6AB);
+    margin-top: 2px;
+}
+
+.schedule-item-content-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.schedule-item-activity {
+    font-size: 14px;
+    color: var(--london-text-primary, #45494D);
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.schedule-item-status {
+    font-size: 10px;
+    margin-top: 4px;
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+.schedule-item-status.done {
+    background: rgba(15, 123, 108, 0.1);
+    color: #0F7B6C;
+}
+
+.schedule-item-status.ongoing {
+    background: rgba(214, 51, 108, 0.1);
+    color: #d6336c;
+}
+
+.schedule-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.schedule-item-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+    color: var(--london-text-muted, #9FA6AB);
+}
+
+.schedule-item-btn:active {
+    background: var(--london-card-alt, #F4F7F9);
+}
+
+.schedule-item-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.schedule-item-btn.delete-btn:active {
+    color: #EB5757;
+}
+
+/* 9. 添加项按钮 */
+.schedule-add-item-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1.5px dashed var(--london-border, rgba(69, 73, 77, 0.2));
+    background: transparent;
+    color: var(--london-text-muted, #9FA6AB);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    margin-bottom: 8px;
+}
+
+.schedule-add-item-btn:active {
+    border-color: var(--london-text-secondary, #5F6B73);
+    color: var(--london-text-secondary, #5F6B73);
+}
+
+.schedule-add-item-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 10. 编辑弹窗 */
+.schedule-edit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10010;
+    background: rgba(31, 38, 46, 0.42);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.schedule-edit-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.schedule-edit-modal {
+    width: 100%;
+    max-width: 380px;
+    background: var(--london-card, #FFFFFF);
+    border-radius: 20px;
+    box-shadow: 0 22px 60px rgba(31, 38, 46, 0.22);
+    overflow: hidden;
+    transform: translateY(16px) scale(0.97);
+    opacity: 0;
+    transition: transform 0.32s cubic-bezier(0.2, 0, 0, 1),
+                opacity 0.25s ease;
+}
+
+.schedule-edit-overlay.active .schedule-edit-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.schedule-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--london-border, rgba(69, 73, 77, 0.12));
+}
+
+.schedule-edit-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--london-text-primary, #45494D);
+}
+
+.schedule-edit-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.schedule-edit-close:active {
+    transform: scale(0.92);
+}
+
+.schedule-edit-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--london-text-primary, #45494D);
+    fill: none;
+    stroke-width: 2;
+}
+
+.schedule-edit-body {
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.schedule-edit-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--london-text-muted, #9FA6AB);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+}
+
+.schedule-edit-input {
+    width: 100%;
+    background: var(--bg-input, #F5F5F7);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-primary, #1D1D1F);
+    font-family: inherit;
+    outline: none;
+    transition: 0.2s;
+    box-sizing: border-box;
+}
+
+.schedule-edit-input:focus {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.schedule-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--bg-input, #F5F5F7);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-primary, #1D1D1F);
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    transition: 0.2s;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+.schedule-edit-textarea:focus {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.schedule-edit-footer {
+    display: flex;
+    gap: 10px;
+    padding: 0 18px 18px;
+}
+
+.schedule-edit-footer .schedule-btn {
+    flex: 1;
+}
+
+/* 11. 空态 */
+.schedule-empty-state {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--london-text-muted, #9FA6AB);
+}
+
+.schedule-empty-state svg {
+    width: 48px;
+    height: 48px;
+    opacity: 0.3;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
+    margin: 0 auto 14px;
+}
+
+.schedule-empty-state p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* 12. 加载态 */
+.schedule-loading {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--london-text-muted, #9FA6AB);
+    font-size: 13px;
+}
+
+.schedule-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--london-border, rgba(69, 73, 77, 0.12));
+    border-top-color: var(--london-accent, #45494D);
+    border-radius: 50%;
+    animation: schedule-spin 0.7s linear infinite;
+    margin: 0 auto 14px;
+}
+
+@keyframes schedule-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 13. Toast */
+.schedule-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--london-accent, #45494D);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10020;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.schedule-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* 14. 暗色容错 */
+@media (prefers-color-scheme: dark) {
+    #schedule-overlay {
+        background: #EAEFF2;
+        color: #45494D;
+    }
+}

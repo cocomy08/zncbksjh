@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beautify - Ceramic Swiss</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ================= System Variables ================= */
+        :root {
+            --bg-body: #F5F5F7;
+            --bg-card: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            
+            /* 更细腻的陶瓷阴影：双层结构，一层负责浮起，一层负责环境光 */
+            --shadow-card: 
+                0 2px 12px rgba(0,0,0,0.02),
+                0 0 0 1px rgba(0,0,0,0.02);
+            
+            /* 悬浮态阴影 */
+            --shadow-hover: 
+                0 8px 24px rgba(0,0,0,0.04),
+                0 0 0 1px rgba(0,0,0,0.02);
+
+            /* 特殊卡片的光晕 */
+            --shadow-prism:
+                0 8px 32px -8px rgba(0, 122, 255, 0.15),
+                0 0 0 1px rgba(255,255,255,0.8) inset;
+
+            --ease-spring: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            /* 极其微弱的噪点，增加纸张感 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        .device-frame {
+            width: 100%; max-width: 420px; height: 100%; 
+            position: relative; display: flex; flex-direction: column;
+        }
+
+        /* ================= Header (极简) ================= */
+        .settings-header {
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 50;
+            background: linear-gradient(to bottom, rgba(245,245,247,0.95) 0%, rgba(245,245,247,0) 100%);
+        }
+
+        .header-icon-button {
+            width: 40px; height: 40px;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.03);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+            outline: none; padding: 0;
+            position: absolute; left: 24px;
+        }
+        .header-icon-button:active { transform: scale(0.92); background: #fff; }
+        .header-icon-button svg { width: 20px; height: 20px; stroke-width: 2.5px; }
+
+        h1 {
+            font-size: 17px; font-weight: 700; color: var(--text-primary);
+            margin: 0 auto; letter-spacing: -0.01em;
+        }
+
+        /* ================= Content ================= */
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 24px 120px;
+            scrollbar-width: none;
+        }
+        .settings-content::-webkit-scrollbar { display: none; }
+
+        .beautify-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px; /* 更紧凑的间距 */
+        }
+
+        /* ================= Card System ================= */
+        .beautify-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex; flex-direction: column; 
+            align-items: flex-start; /* 左对齐更具现代感 */
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: var(--shadow-card);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+            min-height: 140px;
+        }
+
+        .beautify-card:active { transform: scale(0.97); }
+        .beautify-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+        /* 图标容器 (更加低调) */
+        .card-icon-bg {
+            width: 48px; height: 48px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            background: #F9F9F9; /* 默认极淡灰 */
+            color: var(--text-primary);
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        .beautify-card:hover .card-icon-bg { transform: scale(1.05); }
+        .card-icon-bg svg { width: 24px; height: 24px; stroke-width: 2px; }
+
+        /* 文字信息 */
+        .card-info { display: flex; flex-direction: column; gap: 2px; }
+        .card-label { font-size: 15px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+        .card-sub { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+
+        /* ================= Special Cards Customization ================= */
+        
+        /* 1. 全局美化 (Hero Card) - 重构版 */
+        #global-beautify-btn {
+            grid-column: span 2;
+            flex-direction: row;
+            align-items: center;
+            padding: 24px;
+            min-height: 100px;
+            background: #FFFFFF;
+            /* 极淡的珠光渐变 */
+            background: linear-gradient(120deg, #FFFFFF 0%, #F5F7FA 100%);
+            box-shadow: var(--shadow-prism);
+            border: 1px solid rgba(0, 122, 255, 0.05); /* 极细蓝光边框 */
+        }
+        
+        #global-beautify-btn .card-icon-bg {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #E0F7FA 0%, #E3F2FD 100%); /* 清透蓝 */
+            color: #007AFF;
+            margin-right: 16px;
+        }
+        
+        #global-beautify-btn .card-info { flex: 1; }
+        #global-beautify-btn .card-label { font-size: 17px; }
+        #global-beautify-btn .card-sub { font-size: 13px; color: #007AFF; opacity: 0.8; }
+        
+        /* 装饰性箭头 */
+        #global-beautify-btn::after {
+            content: '→'; font-size: 20px; color: #D1D1D6; font-weight: 300; margin-left: 8px;
+        }
+
+        /* 2. 字体 URL (Slim Bar) - 保持通栏但变窄 */
+        #manage-font-urls-btn {
+            grid-column: span 2;
+            flex-direction: row; align-items: center;
+            min-height: 72px; padding: 0 20px;
+        }
+        #manage-font-urls-btn .card-icon-bg {
+            width: 36px; height: 36px; border-radius: 12px; margin-right: 12px;
+            background: #F2F2F7;
+        }
+        #manage-font-urls-btn .card-info { flex: 1; }
+
+        /* 3. 颜色微调 (Desaturated Pastels) - 莫兰迪风格 */
+        /* Change Icon: Blue-Grey */
+        #change-icon-button .card-icon-bg { background: #F0F4F8; color: #546E7A; }
+        
+        /* Icon Presets: Lavender */
+        #manage-presets-button .card-icon-bg { background: #F3E5F5; color: #8E24AA; }
+        
+        /* Theme: Teal */
+        #theme-presets-btn .card-icon-bg { background: #E0F2F1; color: #00897B; }
+        
+        /* Bubble: Sage Green */
+        #bubble-presets-btn .card-icon-bg { background: #E8F5E9; color: #43A047; }
+        
+        /* Clock: Peach */
+        #change-clock-button .card-icon-bg { background: #FFF3E0; color: #FB8C00; }
+        
+        /* Motto: Soft Pink */
+        #motto-settings-btn .card-icon-bg { background: #FCE4EC; color: #D81B60; }
+        
+        /* App Name: Indigo */
+        #app-name-settings-btn .card-icon-bg { background: #E8EAF6; color: #3949AB; }
+
+    </style>
+</head>
+<body>
+
+    <div class="device-frame">
+        <div id="beautify-screen" class="screen">
+            
+            <!-- Header -->
+            <div class="settings-header">
+                <button id="beautify-back-button" class="header-icon-button">
+                    <i data-lucide="arrow-left"></i>
+                </button>
+                <h1>美化</h1>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content">
+                <div class="beautify-grid">
+                    
+                    <!-- 1. Global (Hero) - 现在是清透风格 -->
+                    <div class="beautify-card" id="global-beautify-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="wand-2"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">全局美化</span>
+                            <span class="card-sub">一键应用主题风格</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Change Icon -->
+                    <div class="beautify-card" id="change-icon-button">
+                        <div class="card-icon-bg">
+                            <i data-lucide="image"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">更换图标</span>
+                            <span class="card-sub">自定义应用图标</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Icon Presets -->
+                    <div class="beautify-card" id="manage-presets-button">
+                        <div class="card-icon-bg">
+                            <i data-lucide="layout-grid"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">图标预设</span>
+                            <span class="card-sub">管理图标包</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Theme -->
+                    <div class="beautify-card" id="theme-presets-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="palette"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">主题预设</span>
+                            <span class="card-sub">配色与风格</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Bubble -->
+                    <div class="beautify-card" id="bubble-presets-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="message-circle"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">气泡样式</span>
+                            <span class="card-sub">对话框风格</span>
+                        </div>
+                    </div>
+
+                    <!-- 6. Clock -->
+                    <div class="beautify-card" id="change-clock-button">
+                        <div class="card-icon-bg">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">时钟样式</span>
+                            <span class="card-sub">锁屏时间显示</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. Motto -->
+                    <div class="beautify-card" id="motto-settings-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="align-center"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">签名样式</span>
+                            <span class="card-sub">个性化短语</span>
+                        </div>
+                    </div>
+
+                    <!-- 8. App Name -->
+                    <div class="beautify-card" id="app-name-settings-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="type"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">图标名称</span>
+                            <span class="card-sub">修改显示名称</span>
+                        </div>
+                    </div>
+
+                    <!-- 9. Font URL (Full Width) -->
+                    <div class="beautify-card" id="manage-font-urls-btn">
+                        <div class="card-icon-bg">
+                            <i data-lucide="case-sensitive"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">字体设置</span>
+                            <span class="card-sub">导入自定义字体 URL</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

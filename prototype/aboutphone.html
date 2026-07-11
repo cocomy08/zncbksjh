@@ -1,0 +1,149 @@
+import React, { useState } from 'react';
+import { ArrowLeft, Cpu, Battery, HardDrive, Smartphone, Copy, ChevronRight, Check } from 'lucide-react';
+
+const AboutDevice = () => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] font-sans antialiased flex justify-center items-center p-4 md:p-8">
+      
+      {/* Device Frame */}
+      <div className="w-full max-w-[393px] bg-[#F5F5F7] rounded-[40px] shadow-2xl overflow-hidden relative border-[8px] border-black h-[852px] flex flex-col">
+        
+        {/* Status Bar */}
+        <div className="h-14 flex justify-between items-center px-6 pt-2 z-20">
+            <span className="text-sm font-semibold">9:41</span>
+            <div className="flex gap-1.5 items-center">
+                <div className="w-4 h-4 rounded-full bg-black/10"></div>
+                <div className="w-4 h-4 rounded-full bg-black/10"></div>
+                <div className="w-6 h-3.5 rounded-full border border-black/20"></div>
+            </div>
+        </div>
+
+        {/* Header - Glassmorphism */}
+        <div className="px-6 py-2 flex justify-between items-center z-20 bg-[#F5F5F7]/80 backdrop-blur-md sticky top-0">
+          <button className="w-10 h-10 -ml-2 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors">
+            <ArrowLeft className="w-6 h-6 stroke-[2.5px]" />
+          </button>
+          <span className="text-sm font-bold tracking-widest uppercase text-black/40">About</span>
+          <div className="w-10"></div> {/* Spacer */}
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto pt-4 pb-24 no-scrollbar px-6 space-y-6">
+          
+          {/* 1. The Identity Card (Swiss Hero) */}
+          <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 relative overflow-hidden">
+             {/* Decorative Background Symbol */}
+             <Smartphone className="absolute -right-6 -bottom-6 w-48 h-48 text-black/[0.03] stroke-[1px]" />
+             
+             <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-gradient-to-tr from-gray-100 to-gray-200 rounded-[24px] flex items-center justify-center shadow-inner mb-4 border border-white">
+                    <span className="text-3xl">📱</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight text-[#1D1D1F] mb-1">iPhone 15 Pro</h1>
+                <p className="text-xs font-bold text-black/40 uppercase tracking-widest bg-black/5 px-3 py-1 rounded-full">
+                    This Device
+                </p>
+             </div>
+          </div>
+
+          {/* 2. Specs Grid (Bento Box) */}
+          <div className="grid grid-cols-2 gap-4">
+            
+            {/* Chipset */}
+            <div className="bg-white rounded-[28px] p-5 border border-black/5 shadow-sm flex flex-col justify-between h-36">
+                <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
+                    <Cpu className="w-5 h-5 text-black/60" />
+                </div>
+                <div>
+                    <span className="block text-xs font-bold text-black/40 uppercase tracking-wider mb-1">Processor</span>
+                    <span className="text-xl font-bold font-mono">A17 Pro</span>
+                </div>
+            </div>
+
+            {/* RAM/Memory */}
+            <div className="bg-white rounded-[28px] p-5 border border-black/5 shadow-sm flex flex-col justify-between h-36">
+                <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
+                    <div className="w-5 h-5 flex items-center justify-center font-bold text-xs">8G</div>
+                </div>
+                <div>
+                    <span className="block text-xs font-bold text-black/40 uppercase tracking-wider mb-1">Memory</span>
+                    <span className="text-xl font-bold font-mono">Unified</span>
+                </div>
+            </div>
+            
+             {/* Storage Visualization (Swiss Graph) */}
+            <div className="col-span-2 bg-[#1D1D1F] rounded-[28px] p-6 text-white shadow-lg shadow-black/10 relative overflow-hidden">
+                <div className="flex justify-between items-end mb-6 relative z-10">
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1">Storage</span>
+                        <span className="text-3xl font-bold tracking-tight">256 GB</span>
+                    </div>
+                    <HardDrive className="w-6 h-6 text-white/50" />
+                </div>
+                
+                {/* The "Swiss Bar" - Thick and Bold */}
+                <div className="w-full h-4 bg-white/10 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-[#FF3B30] w-[45%]"></div> {/* Apps */}
+                    <div className="h-full bg-[#32D74B] w-[15%]"></div> {/* Photos */}
+                    <div className="h-full bg-[#0A84FF] w-[10%]"></div> {/* System */}
+                </div>
+                <div className="flex gap-4 mt-3 text-[10px] font-bold tracking-wider uppercase text-white/50">
+                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]"></div>Used</span>
+                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>Free</span>
+                </div>
+            </div>
+
+          </div>
+
+          {/* 3. Detailed List (Clean & Monospace) */}
+          <div className="bg-white rounded-[32px] border border-black/5 shadow-sm overflow-hidden">
+            
+            <div className="p-5 border-b border-black/5 hover:bg-gray-50 transition-colors flex justify-between items-center group cursor-pointer">
+                <span className="text-sm font-medium text-black/60">iOS Version</span>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#1D1D1F]">17.4.1</span>
+                    <span className="w-2 h-2 rounded-full bg-[#FF3B30]"></span> {/* Update Badge */}
+                </div>
+            </div>
+
+            <div className="p-5 border-b border-black/5 hover:bg-gray-50 transition-colors flex justify-between items-center group cursor-pointer">
+                <span className="text-sm font-medium text-black/60">Model Number</span>
+                <span className="text-sm font-mono text-[#1D1D1F] bg-gray-100 px-2 py-1 rounded-md text-xs">MU793ZA/A</span>
+            </div>
+
+            {/* Serial Number with Copy Interaction */}
+            <div className="p-5 hover:bg-gray-50 transition-colors flex justify-between items-center group cursor-pointer" onClick={handleCopy}>
+                <span className="text-sm font-medium text-black/60">Serial Number</span>
+                <div className="flex items-center gap-3">
+                    <span className="text-sm font-mono text-[#1D1D1F] tracking-wide">F17L9X2K0P</span>
+                    {copied ? (
+                        <Check className="w-4 h-4 text-[#32D74B]" />
+                    ) : (
+                        <Copy className="w-4 h-4 text-black/20 group-hover:text-black/60 transition-colors" />
+                    )}
+                </div>
+            </div>
+
+          </div>
+          
+          {/* Footer Info */}
+          <div className="text-center pb-8">
+            <p className="text-[10px] text-black/30 font-medium uppercase tracking-widest">Designed by Apple in California</p>
+            <p className="text-[10px] text-black/20 font-mono mt-1">Assembled in China</p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default AboutDevice;

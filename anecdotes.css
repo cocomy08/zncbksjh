@@ -1,0 +1,786 @@
+/* ============================================
+   📨 逸事 (Anecdotes) - 现代纸条 (Modern Letter Strip)
+   ============================================ */
+
+/* === 全局容器 === */
+.anecdotes-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+    font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+}
+
+.anecdotes-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* === 关闭按钮 === */
+.anecdotes-close-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100002;
+    backdrop-filter: blur(5px);
+}
+.anecdotes-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+}
+
+/* === 爱品入口按钮 (Binder Icon) === */
+.anecdotes-collection-btn {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100002;
+    backdrop-filter: blur(5px);
+}
+.anecdotes-collection-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+.anecdotes-collection-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* === 核心触发器：信封 (Pure CSS Envelope) === */
+.treasure-box {
+    position: relative;
+    width: 140px;
+    height: 90px;
+    background: linear-gradient(to bottom, #fdfbf7, #f4f1ea);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.treasure-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 50px 70px 0 70px;
+    border-color: #e8e4db transparent transparent transparent;
+    transform-origin: top;
+    transition: transform 0.4s ease;
+    z-index: 3;
+    pointer-events: none;
+}
+.treasure-box::after {
+    content: '✉️';
+    font-size: 24px;
+    opacity: 0.3;
+    color: #8b5a2b;
+    z-index: 4;
+}
+.treasure-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+.treasure-box:hover::before {
+    transform: rotateX(20deg);
+}
+.treasure-box.opened {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+}
+.treasure-box.thinking {
+    animation: letterBreath 1.5s infinite ease-in-out;
+}
+@keyframes letterBreath {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* === 纸条容器 === */
+.letter-container {
+    position: absolute;
+    width: 90%;
+    max-width: 380px;
+    height: auto;
+    max-height: 80vh;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+.letter-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* === 纸张本体 === */
+.letter-paper {
+    background: #fffdf9;
+    background-image: linear-gradient(#f0efeb 1px, transparent 1px);
+    background-size: 100% 32px;
+    background-attachment: local;
+    background-position: 0 34px;
+    border-radius: 2px;
+    box-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.05),
+        0 20px 50px rgba(0, 0, 0, 0.1);
+    padding: 35px 30px;
+    padding-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.letter-paper::-webkit-scrollbar { display: none; }
+
+/* === 输入框 === */
+.letter-textarea {
+    width: 100%;
+    min-height: 160px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 17px;
+    line-height: 32px;
+    color: #333;
+    resize: none;
+    outline: none;
+    margin-bottom: 30px;
+}
+.letter-textarea::placeholder {
+    color: #bbb;
+    font-style: italic;
+}
+.letter-input-mode .letter-title { display: none; }
+
+/* === 按钮 (动漫手绘线条风格) === */
+.letter-confirm-btn {
+    width: 100%;
+    padding: 12px 0;
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #bdbdbd;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: auto;
+    box-shadow: 4px 4px 0 #dcdcdc;
+    letter-spacing: 2px;
+}
+.letter-confirm-btn:hover {
+    background: #000000;
+    color: #ffffff;
+    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+    box-shadow: 2px 2px 0 #000000;
+    transform: translate(2px, 2px);
+    letter-spacing: 2px;
+}
+.letter-confirm-btn:active {
+    box-shadow: 0 0 0 #000000;
+    transform: translate(4px, 4px);
+}
+
+/* === 笔按钮样式 (修复巨大的SVG) === */
+.letter-pen-btn {
+    position: absolute;
+    bottom: -60px; /* 移出纸张下方 */
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: none; /* 默认隐藏，需要时只要去掉 display:none 或者设为 flex */
+    /* 实际上HTML结构里它在 letter-container 内部还是外部？
+       根据Step 813，它在 letter-container 内。
+       但是我们希望它浮动。
+    */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    z-index: 10;
+}
+/* 如果它在 letter-container 内部，且容器是 column flex，它会被挤压。
+   检查 index.html 结构... 
+   <div id="anecdotes-letter"...>
+      <div class="letter-paper">...</div>
+      <button ...>
+   </div>
+   container is flex column? 
+   .letter-container { display: flex; flex-direction: column; }
+   So the button will be stacked below the paper.
+   That's fine.
+*/
+.letter-pen-btn {
+    display: flex; /* 覆盖上面的 none, 只要 .letter-container visible */
+    margin-top: 15px;
+    align-self: flex-end; /* 靠右 */
+    position: relative;
+    bottom: auto;
+    right: auto;
+}
+
+.letter-pen-btn svg {
+    width: 24px;
+    height: 24px;
+    color: #555;
+    transition: transform 0.3s;
+}
+.letter-pen-btn:hover {
+    transform: scale(1.1);
+    background: #fdfdfd;
+}
+.letter-pen-btn:hover svg {
+    transform: rotate(15deg);
+    color: #000;
+}
+
+
+/* === 爱品列表容器 (Binder Style) === */
+.anecdotes-collection-modal {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    backdrop-filter: blur(25px);
+    background: rgba(255, 255, 255, 0.4);
+    z-index: 100005;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+.anecdotes-collection-modal.active { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.collection-binder {
+    width: 90%; max-width: 420px;
+    height: 75vh;
+    background: #fdfbf7;
+    border-radius: 6px;
+    /* 活页本效果 */
+    box-shadow: 
+        24px 0 0 #e8e4db inset, /* 侧边 */
+        25px 0 0 rgba(0,0,0,0.05) inset, /* 缝隙阴影 */
+        0 15px 50px rgba(0,0,0,0.15);
+    padding: 20px;
+    padding-left: 50px; /* 让出孔位 */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 活页孔 */
+.collection-binder::before {
+    content: '';
+    position: absolute;
+    top: 30px; bottom: 30px; left: 12px;
+    width: 10px;
+    background-image: radial-gradient(circle, #333 30%, transparent 31%);
+    background-size: 100% 40px;
+}
+
+.binder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #333;
+    margin-bottom: 15px;
+}
+.binder-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+.collection-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+}
+.collection-close-btn:hover { color: #333; }
+
+.collection-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    /* 滚动条 */
+    scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+}
+.collection-list::-webkit-scrollbar { width: 4px; }
+.collection-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+/* 列表项 (活页纸条) */
+.collection-item {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #ccc;
+    position: relative;
+    transition: background 0.2s;
+}
+.collection-item:hover {
+    background: #fafafa;
+}
+.collection-date {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 5px;
+    font-family: "Helvetica Neue", sans-serif; /* 日期用无衬线体更清晰 */
+}
+.collection-summary {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 3; /* Standard property for compatibility */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.collection-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.collection-item:hover .collection-actions { opacity: 1; }
+
+.collection-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #999;
+    transition: color 0.2s;
+}
+.collection-action-btn:hover { color: #333; }
+.collection-action-btn svg { width: 16px; height: 16px; }
+
+/* === 按钮组 (结果页) === */
+.letter-actions button {
+    background: transparent;
+    border: none;
+    border-top: 1px dashed #ddd; /* 与 "再写一封" 保持一致 */
+    color: #999;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    padding: 10px;
+}
+.letter-actions button:hover {
+    color: #8b5a2b;
+    background: rgba(139, 90, 43, 0.05);
+}
+
+/* 隐藏原有古风多余元素 */
+.box-body, .box-lid, .box-body::before, .box-body::after, .box-lid::before, .box-lid::after {
+    display: none;
+}
+
+/* === 内容展示模式 === */
+.letter-response-mode .letter-content {
+    font-size: 17px;
+    line-height: 32px;
+    color: #2c2c2c;
+    white-space: pre-wrap;
+    text-align: left;
+    letter-spacing: 0.05em;
+    padding-bottom: 20px;
+}
+.letter-response-mode::before {
+    content: 'DATE: ' attr(data-date);
+    display: block;
+    font-size: 10px;
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.letter-signature {
+    text-align: right;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #555;
+    font-style: italic;
+}
+
+/* 加载动画 */
+.letter-loading {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.letter-loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid rgba(139, 90, 43, 0.2);
+    border-top-color: #8b5a2b;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+    margin-bottom: 20px;
+}
+.letter-loading-text {
+    font-size: 14px;
+    color: #8b5a2b;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+.anecdotes-hint {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    margin-top: 80px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    font-family: inherit;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   📝 Markdown 渲染样式 for Letter Paper
+   ============================================ */
+
+/* === 段落 === */
+.letter-paragraph {
+    font-size: 17px;
+    line-height: 32px;
+    color: #2c2c2c;
+    margin: 0 0 16px 0;
+    /* 改为左对齐，避免字距过大 */
+    text-align: left;
+    letter-spacing: 0.05em;
+}
+
+/* === 标题系列 === */
+.letter-h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 24px 0 16px 0;
+    line-height: 1.4;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    letter-spacing: 0.1em;
+}
+
+.letter-h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 20px 0 14px 0;
+    line-height: 1.4;
+    border-bottom: 1px solid #d0d0d0;
+    padding-bottom: 6px;
+    letter-spacing: 0.08em;
+}
+
+.letter-h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c2c2c;
+    margin: 18px 0 12px 0;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+}
+
+.letter-h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c2c2c;
+    margin: 16px 0 10px 0;
+    line-height: 1.4;
+}
+
+.letter-h5 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+    margin: 14px 0 8px 0;
+    line-height: 1.4;
+}
+
+.letter-h6 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    margin: 12px 0 6px 0;
+    line-height: 1.4;
+}
+
+/* === 粗体和斜体 === */
+.letter-bold {
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.letter-italic {
+    font-style: italic;
+    color: #555;
+}
+
+.letter-strikethrough {
+    text-decoration: line-through;
+    color: #999;
+    opacity: 0.7;
+}
+
+/* === 代码块 === */
+.letter-code-block {
+    background: #f5f2ed;
+    border: 1px solid #e0ddd8;
+    border-left: 3px solid #8b5a2b;
+    border-radius: 3px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Fira Mono", "Roboto Mono", "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
+
+.letter-code-block::-webkit-scrollbar {
+    height: 6px;
+}
+
+.letter-code-block::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.letter-code-block code {
+    background: none;
+    padding: 0;
+    border: none;
+    font-size: inherit;
+    color: inherit;
+}
+
+/* 代码块语言标签 */
+.letter-code-block[data-lang]::before {
+    content: attr(data-lang);
+    display: block;
+    font-size: 11px;
+    color: #8b5a2b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* === 行内代码 === */
+.letter-inline-code {
+    background: #f5f2ed;
+    border: 1px solid #e0ddd8;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Courier New", monospace;
+    font-size: 15px;
+    color: #8b5a2b;
+    /* 允许换行，避免溢出 */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    /* 行内显示 */
+    display: inline;
+}
+
+/* === 列表 === */
+.letter-ul,
+.letter-ol {
+    margin: 12px 0;
+    padding-left: 28px;
+    line-height: 32px;
+}
+
+.letter-ul {
+    list-style-type: disc;
+}
+
+.letter-ol {
+    list-style-type: decimal;
+}
+
+.letter-li,
+.letter-li-ordered {
+    font-size: 17px;
+    color: #2c2c2c;
+    margin: 6px 0;
+    line-height: 32px;
+    letter-spacing: 0.05em;
+}
+
+.letter-li::marker {
+    color: #8b5a2b;
+}
+
+.letter-li-ordered::marker {
+    color: #8b5a2b;
+    font-weight: 600;
+}
+
+/* === 引用 === */
+.letter-blockquote {
+    background: #faf9f7;
+    border-left: 4px solid #8b5a2b;
+    margin: 16px 0;
+    padding: 12px 20px;
+    font-style: italic;
+    color: #555;
+    line-height: 32px;
+    position: relative;
+}
+
+.letter-blockquote::before {
+    content: '"';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 32px;
+    color: #d0c8b8;
+    font-family: Georgia, serif;
+    line-height: 1;
+}
+
+.letter-blockquote p {
+    margin: 0;
+}
+
+/* === 分隔线 === */
+.letter-hr {
+    border: none;
+    border-top: 1px dashed #ccc;
+    margin: 24px 0;
+    opacity: 0.6;
+}
+
+/* === 链接 === */
+.letter-link {
+    color: #8b5a2b;
+    text-decoration: none;
+    border-bottom: 1px solid #d0c8b8;
+    transition: all 0.2s ease;
+}
+
+.letter-link:hover {
+    color: #6d4623;
+    border-bottom-color: #8b5a2b;
+    background: rgba(139, 90, 43, 0.05);
+}
+
+/* === 图片 === */
+.letter-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 16px auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === 响应式调整 === */
+@media (max-width: 400px) {
+    .letter-paragraph,
+    .letter-li,
+    .letter-li-ordered {
+        font-size: 16px;
+        line-height: 28px;
+    }
+    
+    .letter-h1 { font-size: 22px; }
+    .letter-h2 { font-size: 20px; }
+    .letter-h3 { font-size: 18px; }
+    .letter-h4 { font-size: 17px; }
+    
+    .letter-code-block {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+    
+    .letter-inline-code {
+        font-size: 14px;
+    }
+}
+
+/* === 确保内容容器支持 Markdown === */
+#anecdotes-response-content {
+    font-size: 17px;
+    line-height: 32px;
+    color: #2c2c2c;
+    text-align: left;
+    letter-spacing: 0.05em;
+    padding-bottom: 20px;
+}
+
+/* 移除旧的 white-space: pre-wrap，让 Markdown 自然排版 */
+.letter-response-mode .letter-content {
+    white-space: normal;
+}
+

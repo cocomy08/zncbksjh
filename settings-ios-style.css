@@ -1,0 +1,1338 @@
+/* ==========================================================
+   设置页样式 - 现代原生化 / Native-like Modern Settings
+   设计理念：简约大气、通透层次、柔和光影、细腻交互
+   目标：去网页感，增加原生 App 的玻璃感与分层深度
+   ========================================================== */
+
+:root {
+    /* 基础字体与排版 */
+    --ui-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --base-size: 15px;
+
+    /* 颜色与调性（保留青黛系为主色） */
+    --bg-0: linear-gradient(180deg, #F6F8FA 0%, #F0F3F6 100%); /* 背景渐变，增加通透感 */
+    --grid-bg: #F4F6F8;
+    --card-bg: rgba(255,255,255,0.75); /* 轻微玻璃效果 */
+    --card-bg-solid: #FFFFFF;
+    --card-hover: rgba(255,255,255,0.9);
+    --accent-1: #4FA0C6; /* 主强调色 - 青黛 */
+    --accent-2: #3C7F96; /* 深色强调 */
+    --muted-1: #334155; /* 主文字 */
+    --muted-2: #6B7280; /* 次文字 */
+    --muted-3: #9CA3AF; /* 说明文字 */
+    --border: rgba(16,24,40,0.06);
+    --danger: #E75A4C;
+
+    /* 阴影与层级（方便替换与调试） */
+    --elev-1: 0 6px 18px rgba(16,24,40,0.06);
+    --elev-2: 0 10px 30px rgba(16,24,40,0.08);
+    --elev-3: 0 20px 50px rgba(16,24,40,0.12);
+
+    --glass-blur: 10px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+/* 1. 基础容器 - 网格布局 */
+.settings-content-ios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 28px;
+    background: var(--bg-0);
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    font-family: var(--ui-font);
+    font-size: var(--base-size);
+    color: var(--muted-1);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 响应式：小屏幕单列 */
+@media (max-width: 768px) {
+    .settings-content-ios {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 16px;
+    }
+}
+
+/* 2. 分组卡片 - 扁平方正 */
+.settings-group {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--elev-1);
+    transition: transform 240ms cubic-bezier(.2,.9,.3,1), box-shadow 240ms ease;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* 分组标题 - 顶部色块 */
+.settings-group-header {
+    color: var(--accent-2);
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.4px;
+    margin: 0;
+    border-bottom: 1px solid rgba(16,24,40,0.04);
+}
+
+/* 分组底部说明 */
+.settings-group-footer {
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--grid-text-muted);
+    line-height: 1.6;
+    background-color: #F8F9FA;
+    border-top: 1px solid var(--grid-border);
+}
+
+/* 3. 设置项 - 横向布局 */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    padding: 12px 16px;
+    background-color: transparent;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 160ms ease, transform 160ms ease;
+    will-change: transform;
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+}
+
+.settings-item:hover {
+    background-color: rgba(255,255,255,0.35);
+    transform: translateY(-2px);
+    box-shadow: var(--elev-1);
+}
+
+.settings-item:active {
+    transform: translateY(0);
+}
+
+/* 移除旧的分割线样式 */
+.settings-item::after {
+    display: none;
+}
+
+/* 设置项图标容器 - 方形设计 */
+.settings-icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+    background-color:#F4F4F5;
+    border:1px solid rgba(0,0,0,0.03);
+    color:#18181b;
+    
+    
+}
+
+.settings-icon-container svg,
+.settings-icon-container img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    fill: none;
+}
+
+/* 设置项主要内容区域 */
+.settings-item-content {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.settings-icon-container svg * {
+  stroke: #18181b !important;
+  stroke-width: inherit; /* 保留svg本身的描边粗细，不改动原有尺寸 */
+  stroke-opacity: 1;      /* 描边不透明，纯色显示 */
+}
+
+/* 标签文本 */
+.settings-label {
+    font-size: 14px;
+    color: var(--muted-1);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    flex-shrink: 0;
+    min-width: 90px;
+    max-width: 160px;
+}
+
+/* 右侧值或控件 */
+.settings-value {
+    font-size: 14px;
+    color: var(--muted-2);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+}
+
+/* 输入框样式 - 内联设计 */
+.settings-input {
+    font-size: 14px;
+    color: var(--muted-1);
+    background: rgba(255,255,255,0.85);
+    font-weight: 500;
+    border: 1px solid rgba(16,24,40,0.06) !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 10px 12px;
+    margin: 0;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 260px;
+    text-align: left;
+    font-family: inherit;
+    transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.settings-input:focus {
+    outline: none !important;
+    border-color: var(--accent-1) !important;
+    background: #FFFFFF;
+    box-shadow: 0 6px 18px rgba(79,160,198,0.10) !important;
+}
+
+.settings-input::placeholder {
+    color: var(--grid-text-muted);
+}
+
+/* 按钮样式 - 现代按钮设计 */
+.settings-button-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+    color: #FFFFFF;
+    border: none;
+    outline: none !important;
+    cursor: pointer;
+    padding: 10px 18px;
+    width: auto;
+    text-align: center;
+    font-family: inherit;
+    -webkit-appearance: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(60,127,150,0.12);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+
+.settings-button-text:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(60,127,150,0.12);
+}
+
+.settings-button-text:active {
+    transform: translateY(0);
+}
+
+.settings-button-destructive {
+    
+    
+    border: none !important;
+
+}
+
+
+/* Chevron 箭头 */
+.settings-chevron {
+    opacity: 0.3;
+    filter: grayscale(0%);
+    stroke: var(--grid-text-secondary);
+}
+
+/* 4. 滑块容器 - 现代化设计 */
+.settings-slider-container {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    width: 100%;
+    gap: 12px;
+}
+
+.settings-slider-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--grid-text-primary);
+    font-weight: 500;
+}
+
+/* 滑块轨道 */
+.settings-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: linear-gradient(90deg, rgba(16,24,40,0.06), rgba(16,24,40,0.04));
+    border-radius: 999px;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+/* 滑块按钮 - 方形设计 */
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 6px 16px rgba(60,127,150,0.18);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.settings-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(92, 158, 189, 0.5);
+}
+
+.settings-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--grid-accent), var(--grid-accent-dark));
+    box-shadow: 0 2px 6px rgba(92, 158, 189, 0.4);
+    cursor: pointer;
+    border: none;
+}
+
+/* === Proactive Settings Screen 专项美化 === */
+
+#proactive-settings-screen {
+    background-color: var(--grid-bg);
+}
+
+#proactive-settings-screen .settings-header {
+    background: var(--card-bg-solid);
+    color: var(--muted-1);
+    box-shadow: var(--elev-1);
+    border-bottom: 1px solid rgba(16,24,40,0.04);
+}
+
+#proactive-settings-screen .settings-header h1 {
+    font-size: 20px;
+    color: var(--grid-text-primary);
+    font-weight: 700;
+}
+
+#proactive-settings-screen .header-icon-button {
+    color: var(--grid-text-primary);
+}
+
+/* 针对 proactive 页面的 settings-content */
+#proactive-settings-screen .settings-content {
+    background-color: var(--grid-bg);
+    padding: 24px;
+}
+
+#proactive-settings-screen .settings-group-title {
+    margin-left: 0;
+    margin-bottom: 12px;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--grid-text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+/* 复用卡片样式给 modal-section */
+#proactive-settings-screen .modal-section {
+    background-color: var(--grid-card);
+    border-radius: 8px;
+    box-shadow: var(--grid-shadow);
+    border: 1px solid var(--grid-border);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+/* 复用 Item 样式给 modal-cell */
+#proactive-settings-screen .modal-cell {
+    border-bottom: 1px solid var(--grid-border);
+    background-color: transparent;
+    color: var(--grid-text-primary);
+    padding: 20px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#proactive-settings-screen .modal-cell:last-child {
+    border-bottom: none;
+}
+
+/* 强制隐藏云服务地址输入框 (安全与体验) */
+#offline-service-url-container {
+    display: none !important;
+}
+
+/* 适配 Switch 开关 - 现代化设计 */
+.switch {
+    width: 52px;
+    height: 32px;
+}
+
+.slider.round {
+    border-radius: 999px;
+    background-color: rgba(16,24,40,0.06);
+    border: none;
+    transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.slider.round:before {
+    background-color: #FFFFFF;
+    box-shadow: 0 6px 18px rgba(16,24,40,0.12);
+    width: 26px;
+    height: 26px;
+    left: 3px;
+    bottom: 3px;
+    border-radius: 999px;
+    transition: transform 180ms cubic-bezier(.2,.9,.3,1);
+}
+
+input:checked + .slider {
+    background: #34C759;
+
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Proactive 滑块条适配 */
+#proactive-interval-slider {
+    -webkit-appearance: none;
+    height: 6px;
+    background: var(--grid-border);
+    border-radius: 3px;
+}
+
+#proactive-interval-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--grid-accent), var(--grid-accent-dark));
+    border: none;
+    box-shadow: 0 2px 6px rgba(92, 158, 189, 0.4);
+}
+
+#proactive-interval-display {
+    color: var(--grid-accent) !important;
+    font-weight: 600;
+}
+
+/* 5. 特殊布局：双栏设计（可选） */
+.settings-group.wide {
+    grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+    .settings-group.wide {
+        grid-column: span 1;
+    }
+}
+
+/* 6. 卡片内部分区 */
+.settings-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--grid-border);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--grid-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+/* 7. 网格内部项目 */
+.settings-grid-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.settings-grid-item {
+    background: var(--grid-card-hover);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-grid-item:hover {
+    background: #FFFFFF;
+    border-color: var(--grid-accent);
+    box-shadow: 0 2px 8px rgba(92, 158, 189, 0.2);
+}
+
+.settings-grid-item:active {
+    transform: scale(0.98);
+}
+
+/* 8. 标签组 - 扁平设计 */
+.settings-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.settings-tag {
+    background: var(--grid-card-hover);
+    border: 1px solid var(--grid-border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--grid-text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-tag:hover {
+    background: var(--grid-accent);
+    color: #FFFFFF;
+    border-color: var(--grid-accent);
+}
+
+.settings-tag.active {
+    background: var(--grid-accent);
+    color: #FFFFFF;
+    border-color: var(--grid-accent);
+}
+
+/* 9. 信息提示框 */
+.settings-info-box {
+    background: #E8F4F8;
+    border-left: 4px solid var(--grid-accent);
+    padding: 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--grid-text-primary);
+    line-height: 1.6;
+}
+
+.settings-warning-box {
+    background: #FFF3CD;
+    border-left: 4px solid #FFC107;
+    padding: 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #856404;
+    line-height: 1.6;
+}
+
+.settings-danger-box {
+    background: #F8D7DA;
+    border-left: 4px solid var(--grid-danger);
+    padding: 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #721C24;
+    line-height: 1.6;
+}
+
+/* 10. 页脚信息 - Tag 风格 */
+.settings-footer-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 20px;
+    margin-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--grid-text-secondary);
+    line-height: 1.8;
+}
+
+.settings-footer-info::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #8FB3C4;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+
+/* Footer Tag 样式 */
+.footer-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+ 
+}
+
+.footer-tag.device-tag {
+    background: linear-gradient(135deg, #F0F2F5, #E1E8ED);
+    color: var(--grid-text-primary);
+    border: 1px solid var(--grid-border);
+}
+
+.footer-tag.version-tag {
+    background: #E1F0FF;
+    color: #0052A3;
+     border: 1px solid #CFE4FA;
+}
+
+.footer-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 158, 189, 0.15);
+}
+
+
+
+/* ==================================================
+   Tile Grid — Medilert 风格（来自设计稿）
+   说明：保留原有设置列表样式，新增 .medilert-settings/.tiles 组件
+   使用场景：把设置首页改为 Tile 卡片导航（点击进入二级页）
+   ================================================== */
+
+:root {
+    --light-card-shadow: 0px 1px 5px rgba(24,24,24,0.09);
+    --medilert-icon-shadow: 0px 1px 4px rgba(119,151,240,0.12);
+}
+
+/* 根容器（可按设计稿尺寸调试） */
+.medilert-settings {
+    position: relative;
+    width: 100%;
+    max-width: 393px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--card-bg-solid);
+    -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
+    padding: 18px 16px 80px;
+    font-family: var(--ui-font);
+    color: var(--muted-1);
+}
+
+.medilert-settings .title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--muted-1);
+    margin-top: 8px;
+}
+
+.medilert-settings .back-button,
+.medilert-settings .info-button {
+    position: absolute;
+    top: 18px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+.medilert-settings .back-button { left: 12px; }
+.medilert-settings .info-button { right: 12px; }
+
+.medilert-settings .search {
+    margin: 12px auto 18px;
+    width: calc(100% - 40px);
+    height: 44px;
+    display: flex;
+    gap: 10px;
+    background-color: #F7F7F7;
+    border-radius: 13px;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid rgba(16,24,40,0.04);
+}
+.medilert-settings .search .input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    height: 100%;
+    font-size: 15px;
+    color: var(--muted-2);
+}
+
+.medilert-settings .tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* 设计稿中 class 名为 .div —— 映射为 tile-card */
+.medilert-settings .div,
+.medilert-settings .tile-card {
+    position: relative;
+    width: 160px;
+    height: 184px;
+    border-radius: 23px;
+    border: 0.5px solid #F2F2F2;
+    background: linear-gradient(180deg, rgba(250,250,250,0.9) 0%, rgba(245,245,245,0.9) 100%);
+    box-shadow: var(--light-card-shadow);
+    padding: 18px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.medilert-settings .div:focus,
+.medilert-settings .div:focus-visible,
+.medilert-settings .tile-card:focus,
+.medilert-settings .tile-card:focus-visible {
+    outline: none;
+    box-shadow: 0 12px 32px rgba(16,24,40,0.10);
+    transform: translateY(-6px);
+}
+.medilert-settings .div:hover,
+.medilert-settings .tile-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(16,24,40,0.10);
+}
+
+.medilert-settings .light-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted-1);
+    margin-bottom: 8px;
+    text-align: center;
+}
+.medilert-settings .light-card-subtitle {
+    font-size: 14px;
+    color: var(--muted-2);
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+
+.medilert-settings .icon,
+.medilert-settings .icons-wrapper,
+.medilert-settings .img-wrapper,
+.medilert-settings .icon-2,
+.medilert-settings .icon-3,
+.medilert-settings .icon-4 {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+/* === Voice Settings Wave Animation === */
+.voice-wave-bar {
+    animation-name: voiceWave;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes voiceWave {
+    0%, 100% {
+        transform: scaleY(0.5);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 0.5px solid rgba(94,126,203,0.18);
+    box-shadow: inset 0 1px 4px rgba(255,255,255,0.54), var(--medilert-icon-shadow);
+    background-size: cover;
+}
+
+.medilert-settings .icons {
+    width: 36px;
+    height: 36px;
+}
+
+.medilert-settings .support-button {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 22px;
+    width: 192px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--muted-2);
+    font-size: 13px;
+}
+
+.medilert-settings .version-number {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 6px;
+    font-size: 13px;
+    color: rgba(130,130,130,0.9);
+}
+
+/* Tile focus-visible accessibility */
+.medilert-settings .div[tabindex],
+.medilert-settings .tile-card[tabindex] {
+    outline: none;
+}
+.medilert-settings .div[tabindex]:focus-visible,
+.medilert-settings .tile-card[tabindex]:focus-visible {
+    box-shadow: 0 12px 32px rgba(16,24,40,0.12);
+    transform: translateY(-6px);
+}
+
+@media (max-width: 420px) {
+    .medilert-settings { padding: 12px 12px 80px; }
+    .medilert-settings .div, .medilert-settings .tile-card { width: 148px; height: 168px; border-radius: 16px; }
+    .medilert-settings .icon, .medilert-settings .icons-wrapper { width: 46px; height: 46px; }
+}
+
+/* 小提示：要在页面中生效，请将设置页容器替换为 .medilert-settings，或在外层容器上添加 .medilert-settings */
+
+
+/* ==========================================================
+   主动消息设置页 - 全新陶瓷卡片设计 (Proactive Message Settings)
+   设计灵感来源：原型图 ActiveMessageprototype.html
+   ========================================================== */
+
+/* 隐藏滚动条 */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 主容器基础样式 */
+#proactive-settings-screen.proactive-redesign {
+    background-color: #F5F5F7;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+    color: #09090b;
+    letter-spacing: -0.015em;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================= Header ================= */
+.proactive-header {
+   
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F5F5F7;
+    
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-shrink: 0;
+    padding-top:50px;
+}
+
+.proactive-header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #09090b;
+}
+
+.proactive-btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.proactive-btn-icon:active { background: #f4f4f5; }
+.proactive-btn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.proactive-btn-text {
+    border: none;
+    background: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2563eb;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.proactive-btn-text:hover { background: rgba(37, 99, 235, 0.08); }
+.proactive-btn-text:active { opacity: 0.6; }
+
+/* ================= Main Content ================= */
+.proactive-main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ================= 陶瓷卡片 Ceramic Card ================= */
+.proactive-ceramic-card {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* ================= Section Header ================= */
+.proactive-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+.proactive-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.proactive-section-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #09090b;
+    font-family: "SF Mono", Menlo, monospace;
+}
+
+/* ================= 主开关卡片 Master Switch ================= */
+.proactive-switch-card {
+    padding: 30px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.proactive-switch-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.proactive-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.proactive-info-text h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #09090b;
+    margin: 0 0 2px 0;
+}
+.proactive-info-text p {
+    font-size: 13px;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+/* ================= Toggle Button ================= */
+.proactive-toggle-wrapper {
+    position: relative;
+    width: 52px;
+    height: 32px;
+    flex-shrink: 0;
+}
+.proactive-toggle-checkbox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+}
+.proactive-toggle-label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #e4e4e7;
+    border-radius: 99px;
+    transition: background 0.3s;
+}
+.proactive-toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.proactive-toggle-checkbox:checked + .proactive-toggle-label {
+    background-color: #34C759;
+}
+.proactive-toggle-checkbox:checked + .proactive-toggle-label .proactive-toggle-knob {
+    transform: translateX(20px);
+    border-color: transparent;
+}
+
+/* ================= 滑块 Slider ================= */
+.proactive-slider-container {
+    position: relative;
+    height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px;
+}
+
+.proactive-scale-marks {
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    opacity: 0.2;
+    transform: translateY(-6px);
+}
+.proactive-scale-line {
+    width: 1px;
+    height: 12px;
+    background: #000;
+}
+
+.proactive-slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.proactive-track-bg {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: #f4f4f5;
+    border-radius: 99px;
+    overflow: hidden;
+}
+.proactive-track-fill {
+    height: 100%;
+    background: #18181B;
+    width: 9%; /* 初始值 (10-5)/(60-5)*100 ≈ 9% */
+    transition: width 0.1s ease;
+}
+
+.proactive-slider-input {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: absolute;
+    z-index: 10;
+    cursor: pointer;
+    margin: 0;
+}
+
+.proactive-slider-thumb {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+    left: calc(9% - 14px);
+    pointer-events: none;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.1s ease;
+}
+.proactive-thumb-dot {
+    width: 6px;
+    height: 6px;
+    background: #09090b;
+    border-radius: 50%;
+}
+
+.proactive-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+/* ================= 系统指令输入 Prompt Input ================= */
+.proactive-optimize-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4f46e5;
+    background: #eef2ff;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.proactive-optimize-btn:active { background: #e0e7ff; }
+.proactive-optimize-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.proactive-textarea-wrapper {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s;
+}
+.proactive-textarea-wrapper:focus-within {
+    box-shadow: 0 0 0 2px #e4e4e7;
+    border-color: #a1a1aa;
+}
+
+.proactive-prompt-textarea {
+    width: 100%;
+    height: 160px;
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #27272a;
+    background: transparent;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.proactive-prompt-textarea::placeholder { color: #d4d4d8; }
+
+.proactive-char-count {
+    padding: 10px 16px;
+    border-top: 1px solid #f4f4f5;
+    background: rgba(249, 250, 251, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    font-size: 11px;
+    color: #a1a1aa;
+}
+
+/* ================= 角色选择网格 Agent Grid ================= */
+.proactive-multi-select-badge {
+    font-size: 11px;
+    color: #a1a1aa;
+    background: #fff;
+    padding: 3px 8px;
+    border-radius: 99px;
+    border: 1px solid #f4f4f5;
+}
+
+.proactive-agent-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 4px;
+}
+
+/* 响应式：小屏幕3列 */
+@media (max-width: 360px) {
+    .proactive-agent-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.proactive-agent-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-width: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.proactive-avatar-box {
+    position: relative;
+    width: 70%;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3f3f46;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    overflow: hidden;
+}
+
+.proactive-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.proactive-agent-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #52525b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+}
+
+/* 选中状态 */
+.proactive-agent-item.selected .proactive-avatar-box {
+    border-color: #09090b;
+    box-shadow: 0 0 0 2px #09090b;
+    background-color: #fff;
+    color: #09090b;
+}
+
+.proactive-agent-item.selected .proactive-agent-name {
+    color: #09090b;
+    font-weight: 600;
+}
+
+/* 勾选角标 */
+.proactive-check-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: #3b82f6;
+    border: 2px solid #F4F4F5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+}
+
+.proactive-agent-item.selected .proactive-check-badge {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.proactive-check-badge svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 3;
+}
+
+/* 点击效果 */
+.proactive-agent-item:active .proactive-avatar-box {
+    transform: scale(0.96);
+}
+
+/* 空状态 */
+.proactive-agent-grid-empty {
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+    text-align: center;
+    color: #a1a1aa;
+    font-size: 14px;
+}
+
+/* iOS 适配 */
+@supports (-webkit-touch-callout: none) {
+    .proactive-header {
+        padding-top: env(safe-area-inset-top);
+        height: calc(56px + env(safe-area-inset-top));
+    }
+    
+    .proactive-main-content {
+        padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+}

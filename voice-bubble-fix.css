@@ -1,0 +1,125 @@
+/* ============================================================ */
+/* === 语音消息布局修复 ===                                      */
+/* ============================================================ */
+
+/* 
+ * 修复问题：语音播放按钮应该和头像对齐，
+ * 文本气泡应该在语音按钮下方展开（垂直布局）
+ */
+
+/* ========== 核心修复：强制垂直布局 ========== */
+/* 语音消息包装器 - 使用垂直布局（最高优先级） */
+div.voice-message-wrapper {
+    display: flex !important;
+    flex-direction: column !important;  /* 关键：垂直布局 */
+    align-items: flex-start !important;
+    gap: 4px !important;  /* 播放按钮和文本之间的间距 */
+}
+
+/* AI的语音消息 - 左对齐 */
+div.voice-message-wrapper:not(:has(.user-bubble)) {
+    align-items: flex-start !important;
+}
+
+/* 用户的语音消息 - 右对齐 */
+div.voice-message-wrapper:has(.user-bubble) {
+    align-items: flex-end !important;
+}
+
+/* ========== 语音播放按钮样式 ========== */
+/* 确保播放按钮不会撑开整个宽度 */
+.voice-message-wrapper > .chat-bubble,
+.voice-message-wrapper > .voice-audio-bubble,
+.voice-message-wrapper > .clickable-voice-bubble {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    margin: 0 !important;
+    align-self: auto !important;  /* 重置对齐，使用父容器的align-items */
+    max-width: none !important; /* 修复：移除60px的具体限制，让JS计算的宽度生效 */
+    min-width: 60px !important; /* 保持最小宽度的底线 */
+    white-space: nowrap !important; /* 修复：强制不换行 */
+}
+
+/* ========== 语音文本面板样式 ========== */
+/* 文本容器 - 应该在播放按钮下方 */
+.voice-message-wrapper > .voice-transcript,
+.voice-message-wrapper > .voice-text-panel {
+    position: relative !important;
+    display: none !important;  /* 默认隐藏 */
+    padding: 8px 26px 8px 8px !important;  /* 右边留空间给折叠按钮 */
+    margin: 0 !important;
+    border-radius: 8px !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    line-height: 1.4 !important;
+    word-wrap: break-word !important;
+    transition: all 0.3s ease !important;
+    width: auto !important;
+    max-width: 220px !important;  /* 限制最大宽度 */
+    align-self: auto !important;  /* 使用父容器的align-items */
+}
+
+/* 显示状态 */
+.voice-message-wrapper > .voice-transcript.visible,
+.voice-message-wrapper > .voice-text-panel.visible {
+    display: block !important;
+}
+
+/* 用户的语音文本 - 折叠按钮在左边 */
+.voice-message-wrapper:has(.user-bubble) > .voice-transcript,
+.voice-message-wrapper:has(.user-bubble) > .voice-text-panel {
+    padding: 8px 8px 8px 26px !important;  /* 左边留空间给按钮 */
+}
+
+/* ========== 折叠按钮样式 ========== */
+.voice-collapse-btn {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;  /* 默认在右边（AI消息）*/
+    width: 18px !important;
+    height: 18px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: #666 !important;
+    font-size: 9px !important;
+    line-height: 18px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    z-index: 10 !important;
+}
+
+/* 用户消息的折叠按钮在左边 */
+.voice-message-wrapper:has(.user-bubble) .voice-collapse-btn {
+    left: 4px !important;
+    right: auto !important;
+}
+
+.voice-collapse-btn:hover {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: #333 !important;
+    transform: scale(1.1) !important;
+}
+
+.voice-collapse-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* ========== 动画效果 ========== */
+@keyframes voiceFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.voice-transcript.fade-in,
+.voice-text-panel.fade-in {
+    animation: voiceFadeIn 0.3s ease forwards !important;
+}
+

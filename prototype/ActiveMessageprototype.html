@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Active Message Config</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ================= Reset & Base ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: #F4F4F5; /* Zinc-100 */
+            color: #09090b;
+            letter-spacing: -0.015em;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 隐藏滚动条 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ================= Layout Containers ================= */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #F4F4F5;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px; /* 模块间距 */
+        }
+
+        /* ================= Header ================= */
+        .header {
+            height: 56px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(244, 244, 245, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #09090b;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-icon:active { background: #f4f4f5; }
+
+        .btn-text {
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2563eb; /* Blue-600 */
+            cursor: pointer;
+        }
+        .btn-text:active { opacity: 0.6; }
+
+        /* ================= Components: Cards & Typography ================= */
+        .ceramic-card {
+            background-color: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #a1a1aa; /* Zinc-400 */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+            font-family: monospace;
+        }
+
+        /* ================= Master Switch ================= */
+        .switch-card {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .switch-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0fdf4; /* Green-50 */
+            color: #16a34a; /* Green-600 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #09090b;
+            margin-bottom: 2px;
+        }
+        .info-text p {
+            font-size: 13px;
+            color: #a1a1aa;
+        }
+
+        /* Toggle Button */
+        .toggle-wrapper {
+            position: relative;
+            width: 48px;
+            height: 28px;
+        }
+        .toggle-checkbox {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 2;
+            cursor: pointer;
+        }
+        .toggle-label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #e4e4e7;
+            border-radius: 99px;
+            transition: background 0.3s;
+        }
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-knob {
+            transform: translateX(20px);
+            border-color: transparent;
+        }
+
+        /* ================= Slider ================= */
+        .slider-container {
+            position: relative;
+            height: 96px; /* h-24 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .scale-marks {
+            position: absolute;
+            top: 50%;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+        .scale-line {
+            width: 1px;
+            height: 12px;
+            background: #000;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .track-bg {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: #f4f4f5;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .track-fill {
+            height: 100%;
+            background: #18181B;
+            width: 50%;
+        }
+
+        .slider-input {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            position: absolute;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .thumb-dot {
+            width: 6px;
+            height: 6px;
+            background: #09090b;
+            border-radius: 50%;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 11px;
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+
+        /* ================= Prompt Input ================= */
+        .optimize-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4f46e5; /* Indigo-600 */
+            background: #eef2ff; /* Indigo-50 */
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .optimize-btn:active { background: #e0e7ff; }
+
+        .textarea-wrapper {
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+        }
+        .textarea-wrapper:focus-within {
+            box-shadow: 0 0 0 2px #e4e4e7;
+            border-color: #a1a1aa;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            height: 160px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #27272a;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+        .prompt-textarea::placeholder { color: #d4d4d8; }
+
+        .char-count {
+            padding: 8px 16px;
+            border-top: 1px solid #f4f4f5;
+            background: rgba(249, 250, 251, 0.5);
+            display: flex;
+            justify-content: flex-end;
+            font-size: 11px;
+            color: #a1a1aa;
+        }
+
+        /* ================= Agent Grid (Pure CSS) ================= */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 一行4个 */
+            gap: 12px;
+            padding: 4px; /* 防止阴影被切 */
+        }
+
+        .agent-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            min-width: 0; /* 防止grid溢出 */
+        }
+
+        .avatar-box {
+            position: relative;
+            width: 70%; /* 响应式宽度 */
+            aspect-ratio: 1 / 1; /* 保持正方形 */
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3f3f46;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .agent-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #52525b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* 选中状态逻辑 - 不变黑，只加边框 */
+        .agent-item.selected .avatar-box {
+            border-color: #09090b; /* 黑色边框 */
+            box-shadow: 0 0 0 1px #09090b; /* 加粗边框效果 */
+            background-color: #fff; /* 保持白色背景 */
+            color: #09090b;
+        }
+
+        .agent-item.selected .agent-name {
+            color: #09090b;
+            font-weight: 600;
+        }
+
+        /* 勾选角标 */
+        .check-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background-color: #3b82f6; /* Blue-500 */
+            border: 2px solid #F4F4F5; /* 与背景色同色，形成切割感 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+        }
+
+        .agent-item.selected .check-badge {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        /* Add Button Style */
+        .avatar-box.add-btn {
+            background-color: #f9fafb;
+            border: 1px dashed #d4d4d8;
+            color: #a1a1aa;
+        }
+        .agent-item:active .avatar-box {
+            transform: scale(0.96);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <button class="btn-icon">
+                <i data-lucide="arrow-left" style="width: 20px; height: 20px; stroke-width: 2;"></i>
+            </button>
+            <span class="header-title">Active Message</span>
+            <button class="btn-text">Save</button>
+        </header>
+
+        <main class="main-content hide-scrollbar">
+            
+            <!-- 1. Master Switch -->
+            <section class="ceramic-card switch-card">
+                <div class="switch-info">
+                    <div class="icon-circle">
+                        <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <div class="info-text">
+                        <h3>Enable Feature</h3>
+                        <p>Allow AI to start chat</p>
+                    </div>
+                </div>
+                <div class="toggle-wrapper">
+                    <input type="checkbox" id="toggle-active" checked class="toggle-checkbox"/>
+                    <label for="toggle-active" class="toggle-label">
+                        <div class="toggle-knob"></div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- 2. Probability Slider -->
+            <section>
+                <div class="section-header">
+                    <h4 class="section-title">Trigger Probability</h4>
+                    <span id="slider-value" class="section-value">50%</span>
+                </div>
+                
+                <div class="ceramic-card slider-container">
+                    <!-- Decor: Scale Marks -->
+                    <div class="scale-marks">
+                        <div class="scale-line"></div>
+                        <div class="scale-line"></div>
+                        <div class="scale-line"></div>
+                        <div class="scale-line"></div>
+                        <div class="scale-line"></div>
+                    </div>
+
+                    <div class="slider-wrapper">
+                        <div class="track-bg">
+                            <div id="slider-fill" class="track-fill"></div>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" id="probability-range" class="slider-input">
+                        <div id="slider-thumb" class="slider-thumb">
+                            <div class="thumb-dot"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-labels">
+                        <span>Rarely</span>
+                        <span>Often</span>
+                        <span>Always</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Prompt Input (Moved Above Agents) -->
+            <section>
+                <div class="section-header">
+                    <h4 class="section-title">System Instruction</h4>
+                    <button class="optimize-btn">
+                        <i data-lucide="wand-2" style="width: 12px; height: 12px;"></i>
+                        Optimize
+                    </button>
+                </div>
+
+                <div class="ceramic-card textarea-wrapper">
+                    <textarea 
+                        class="prompt-textarea" 
+                        placeholder="e.g. When the user is idle for a while, ask them if they need help with their coding tasks..."
+                    >当用户长时间不说话时，你可以主动发起话题。请保持语气轻松活泼，像一个老朋友一样...</textarea>
+                    
+                    <div class="char-count">
+                        <span>42 / 200 chars</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Agent Selection (Grid Layout, Moved Bottom) -->
+            <section>
+                <div class="section-header">
+                    <h4 class="section-title">Apply to Agents</h4>
+                    <span style="font-size: 11px; color: #a1a1aa; background: #fff; padding: 2px 6px; border-radius: 99px; border: 1px solid #f4f4f5;">Select Multiple</span>
+                </div>
+
+                <div class="agent-grid">
+                    
+                    <!-- Agent 1 -->
+                    <div class="agent-item selected" onclick="toggleAgent(this)">
+                        <div class="avatar-box">
+                            <i data-lucide="bot" style="width: 28px; height: 28px; stroke-width: 1.5;"></i>
+                            <div class="check-badge">
+                                <i data-lucide="check" style="width: 12px; height: 12px; stroke-width: 3;"></i>
+                            </div>
+                        </div>
+                        <span class="agent-name">Copilot</span>
+                    </div>
+
+                    <!-- Agent 2 -->
+                    <div class="agent-item" onclick="toggleAgent(this)">
+                        <div class="avatar-box">
+                            <i data-lucide="palette" style="width: 28px; height: 28px; stroke-width: 1.5;"></i>
+                            <div class="check-badge">
+                                <i data-lucide="check" style="width: 12px; height: 12px; stroke-width: 3;"></i>
+                            </div>
+                        </div>
+                        <span class="agent-name">Designer</span>
+                    </div>
+
+                    <!-- Agent 3 -->
+                    <div class="agent-item selected" onclick="toggleAgent(this)">
+                        <div class="avatar-box">
+                            <span style="font-size: 18px; font-weight: 700;">R</span>
+                            <div class="check-badge">
+                                <i data-lucide="check" style="width: 12px; height: 12px; stroke-width: 3;"></i>
+                            </div>
+                        </div>
+                        <span class="agent-name">Lisa</span>
+                    </div>
+
+                    <!-- Agent 4 -->
+                    <div class="agent-item" onclick="toggleAgent(this)">
+                        <div class="avatar-box">
+                            <i data-lucide="languages" style="width: 28px; height: 28px; stroke-width: 1.5;"></i>
+                            <div class="check-badge">
+                                <i data-lucide="check" style="width: 12px; height: 12px; stroke-width: 3;"></i>
+                            </div>
+                        </div>
+                        <span class="agent-name">Trans</span>
+                    </div>
+
+                    <!-- Add Button -->
+                    <div class="agent-item">
+                        <div class="avatar-box add-btn">
+                            <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <span class="agent-name" style="color: #a1a1aa;">Add</span>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Slider Logic
+        const rangeInput = document.getElementById('probability-range');
+        const sliderFill = document.getElementById('slider-fill');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sliderValue = document.getElementById('slider-value');
+
+        function updateSlider() {
+            const val = rangeInput.value;
+            const percent = val + '%';
+            
+            sliderValue.textContent = percent;
+            sliderFill.style.width = percent;
+            
+            // 简单的居中偏移计算，避免拇指超出
+            sliderThumb.style.left = `calc(${percent} - 14px)`; 
+        }
+
+        rangeInput.addEventListener('input', updateSlider);
+        // Init
+        // 模拟一点点延迟加载，防止布局未渲染导致错位（虽不常见）
+        setTimeout(updateSlider, 0);
+
+
+        // 2. Agent Selection Logic
+        function toggleAgent(element) {
+            element.classList.toggle('selected');
+            
+            if(window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(5);
+            }
+        }
+    </script>
+</body>
+</html>

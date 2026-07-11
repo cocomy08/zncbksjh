@@ -1,0 +1,56 @@
+
+/* 文本域右上角的小操作按钮 (macOS风格) */
+.textarea-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* 确保 textarea 有足够的右边距，防止文字被按钮遮挡 */
+.settings-textarea-field {
+    padding-right: 70px !important;
+}
+
+.textarea-actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+    pointer-events: none; /* 容器透传点击，但按钮自身 pointer-events: auto */
+}
+
+.mini-action-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(240, 240, 245, 0.8); /* 浅灰透视 */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #888;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: auto;
+}
+
+.mini-action-btn:hover {
+    background: rgba(225, 225, 230, 0.9);
+    transform: scale(1.08);
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.mini-action-btn:active {
+    transform: scale(0.95);
+}
+
+.mini-action-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+

@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/netease/:path*", "destination": "http://121.4.83.241:3001/api/:path*" },
+    { "source": "/auth-api/:path*", "destination": "http://121.4.83.241:3002/api/:path*" }
+  ]
+}

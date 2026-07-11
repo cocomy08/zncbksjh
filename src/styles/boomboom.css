@@ -1,0 +1,692 @@
+/* ============================================
+   心跳信号 (Boomboom) - CHAR手机界面样式
+   核心视觉系统：暗夜·杂志·流体
+   ============================================ */
+
+/* --- 0. 颜色变量 --- */
+:root {
+    --bb-bg-deep: #050505;
+    --bb-bg-card: #121212;
+    --bb-bg-card-hover: #1A1A1A;
+    
+    --bb-text-primary: #EAEAEA;
+    --bb-text-secondary: #888888;
+    --bb-text-accent: #D4AF37; /* 香槟金 */
+    
+    --bb-accent-mystic: #8e44ad; /* 私密紫 */
+    --bb-accent-blue: #2980B9; /* 冷静蓝 */
+    
+    --bb-font-display: "Songti SC", "SimSun", "Times New Roman", serif;
+    --bb-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bb-font-mono: "SF Mono", "Menlo", monospace;
+
+    --bb-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --bb-ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- 1. 主容器 --- */
+#boomboom-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100vh;
+    background-color: #000;
+    background: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #000 70%);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#boomboom-screen.active {
+    display: flex;
+}
+
+.bb-device-frame {
+    width: 100%;
+    max-width: 414px;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0 auto;
+    min-height: 0;
+
+}
+
+/* 隐藏滚动条 */
+.bb-hide-scroll::-webkit-scrollbar { display: none; }
+.bb-hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* --- 2. 顶部英雄区域 --- */
+.bb-hero-header {
+    padding: 80px 24px 20px;
+    z-index: 10;
+}
+
+.bb-hero-date {
+    font-family: var(--bb-font-mono);
+    font-size: 11px;
+    color: var(--bb-text-secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+.bb-hero-title {
+    font-family: var(--bb-font-display);
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--bb-text-primary);
+    line-height: 1.1;
+    background: linear-gradient(to right, #fff, #999);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- 3. 视口 --- */
+.bb-viewport {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 20px 120px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    min-height: 0;
+}
+
+/* --- 4. 卡片风格 --- */
+.bb-void-card {
+    background: var(--bb-bg-card);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--bb-ease-out), background 0.3s;
+    border-left: 2px solid transparent;
+    color:white;
+}
+
+.bb-void-card:active {
+    transform: scale(0.98);
+    background: var(--bb-bg-card-hover);
+}
+
+
+
+.bb-card-label {
+    font-family: var(--bb-font-mono);
+    font-size: 10px;
+    color: var(--bb-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* --- 5. 搜索框：极简线条 --- */
+.bb-input-line-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.bb-input-line {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    color: #fff;
+    font-family: var(--bb-font-display);
+    font-size: 18px;
+    padding: 10px 0;
+    outline: none;
+    transition: 0.3s;
+}
+
+.bb-input-line:focus {
+    border-bottom-color: var(--bb-text-accent);
+}
+
+.bb-input-icon {
+    position: absolute;
+    right: 0;
+    top: 10px;
+    opacity: 0.5;
+}
+
+/* --- 6. 视网膜记忆流 --- */
+.bb-retina-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.bb-retina-item {
+    min-width: 140px;
+    height: 200px;
+    background: #222;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.bb-retina-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.bb-retina-item:hover .bb-retina-bg {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.bb-retina-overlay {
+    position: relative;
+    z-index: 2;
+}
+
+.bb-retina-time {
+    font-family: var(--bb-font-mono);
+    font-size: 9px;
+    color: #aaa;
+}
+
+.bb-retina-desc {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 4px;
+    color: #fff;
+}
+
+/* --- 7. 钱包：票据风格 --- */
+.bb-receipt-card {
+    background: #fff;
+    color: #000;
+    border-radius: 2px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    font-family: var(--bb-font-mono);
+    clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 5% 100%, 0 95%);
+}
+
+.bb-receipt-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #000;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.bb-receipt-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.bb-receipt-note {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.bb-receipt-tag {
+    position: absolute;
+    top: 10px;
+    right: -25px;
+    background: #000;
+    color: #fff;
+    font-size: 9px;
+    padding: 2px 25px;
+    transform: rotate(45deg);
+}
+
+/* --- 8. 心跳入口：呼吸的红点 --- */
+.bb-heartbeat-trigger {
+    background: linear-gradient(135deg, #1a0b1f 0%, #000 100%);
+    border: 1px solid rgba(142, 68, 173, 0.2);
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    min-height: 120px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.bb-pulse-core {
+    width: 16px;
+    height: 16px;
+    background: var(--bb-accent-mystic);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--bb-accent-mystic);
+    animation: bbHeartBeat 1.5s infinite;
+}
+
+@keyframes bbHeartBeat {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 40px var(--bb-accent-mystic); }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* --- 9. 聊天列表 --- */
+.bb-chat-row {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+}
+
+.bb-chat-initial {
+    font-family: var(--bb-font-display);
+    font-size: 24px;
+    color: var(--bb-text-accent);
+    width: 40px;
+    text-align: center;
+}
+
+.bb-chat-body {
+    flex: 1;
+}
+
+.bb-chat-name {
+    font-size: 12px;
+    color: var(--bb-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.bb-chat-preview {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.4;
+}
+
+/* --- 10. 交互层 (Overlay) --- */
+.bb-overlay {
+    position: absolute;
+    inset: 0;
+    background: #080808;
+    z-index: 150; /* 提升层级，确保在主返回按钮(110)之上 */
+    transform: translateY(110%);
+    transition: transform 0.5s var(--bb-ease-out);
+    display: flex;
+    flex-direction: column;
+}
+
+.bb-overlay.active {
+    transform: translateY(0);
+}
+
+.bb-overlay-nav {
+    padding: 40px 24px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bb-overlay-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 160; /* 确保在overlay之上 */
+}
+
+/* --- 11. 心跳信号界面 - 红色调 --- */
+.bb-heartbeat-room {
+    background: #000;
+    background-image: radial-gradient(circle at 50% 30%, #240030 0%, #000 70%);
+}
+
+.bb-mood-card {
+    margin: 24px;
+    padding: 30px;
+    border: 1px solid #333;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(10px);
+    position: relative;
+    border-radius: 4px;
+}
+
+.bb-mood-bg-text {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 80px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.03);
+    font-family: var(--bb-font-display);
+    pointer-events: none;
+}
+
+.bb-mood-content {
+    font-family: var(--bb-font-display);
+    font-size: 18px;
+    line-height: 1.8;
+    color: #ddd;
+}
+
+/* --- 12. 聊天界面 --- */
+.bb-chat-window {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bb-bubble {
+    max-width: 80%;
+    padding: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+}
+
+.bb-bubble.left {
+    align-self: flex-start;
+    background: #1A1A1A;
+    color: #ccc;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 22px;
+    border-bottom-right-radius: 22px;
+    border-bottom-left-radius: 22px;
+}
+
+.bb-bubble.right {
+    align-self: flex-end;
+    background: white;
+    color: #000;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+}
+
+/* --- 13. 底部导航 (Custom Dock) --- */
+.bb-nav-dock {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    background: rgba(20, 20, 20, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: 1px solid #333;
+    z-index: 50;
+}
+
+.bb-nav-icon {
+    color: #555;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.bb-nav-icon.active {
+    color: var(--bb-text-primary);
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+.bb-nav-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+.bb-nav-dot {
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.bb-nav-icon.active .bb-nav-dot {
+    opacity: 1;
+}
+
+/* --- 14. View Animation --- */
+.bb-view-section {
+    display: none;
+    /* opacity: 0; Removed to prevent visibility sticking */
+    /* animation: bbFadeSlide 0.5s forwards; Removed to isolate display issue */
+}
+
+.bb-view-section.active {
+    display: block !important; /* Force display */
+    opacity: 1 !important;
+    animation: none !important;
+}
+
+@keyframes bbFadeSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 15. 标签栏 (Tab Bar) for Wallet --- */
+.bb-tab-bar {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #222;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.bb-tab-item {
+    padding: 10px 0;
+    color: #555;
+    cursor: pointer;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid transparent;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.bb-tab-item.active {
+    color: var(--bb-text-accent);
+    border-bottom-color: var(--bb-text-accent);
+}
+
+/* --- 16. 加载界面 --- */
+.bb-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    z-index: 200;
+    display: none; /* 默认隐藏 */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.bb-loading-overlay.active {
+    display: flex;
+}
+
+.bb-loading-overlay.hidden {
+    display: none !important;
+}
+
+.bb-loading-lock {
+    width: 60px;
+    height: 80px;
+    position: relative;
+}
+
+.bb-loading-lock-body {
+    position: absolute;
+    bottom: 0;
+    width: 60px;
+    height: 50px;
+    background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bb-loading-lock-shackle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 35px;
+    border: 4px solid #555;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+    animation: bbShackleUnlock 2s ease-in-out infinite;
+}
+
+@keyframes bbShackleUnlock {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    50% { transform: translateX(-50%) rotate(-20deg); transform-origin: left bottom; }
+}
+
+.bb-loading-keyhole {
+    width: 8px;
+    height: 8px;
+    background: #D4AF37;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #D4AF37;
+    animation: bbKeyholePulse 1s ease-in-out infinite;
+}
+
+@keyframes bbKeyholePulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; box-shadow: 0 0 20px #D4AF37; }
+}
+
+.bb-loading-text {
+    font-family: var(--bb-font-mono);
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: bbLoadingDots 1.5s infinite;
+}
+
+@keyframes bbLoadingDots {
+    0% { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+}
+
+.bb-loading-text::after {
+    content: '';
+    animation: bbDots 1.5s steps(3, end) infinite;
+}
+
+@keyframes bbDots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+}
+
+/* --- 17. 错误提示 --- */
+.bb-error-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(192, 57, 43, 0.9);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.bb-error-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* --- 18. 返回按钮 --- */
+.bb-back-btn {
+    position: absolute;
+    top: calc(max(env(safe-area-inset-top), 16px) + 10px);
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 110;
+    transition: transform 0.2s;
+}
+
+.bb-back-btn:active {
+    transform: scale(0.95);
+}
+
+.bb-back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff;
+}

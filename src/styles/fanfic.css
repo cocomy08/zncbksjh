@@ -1,0 +1,1041 @@
+/* =====================================================================
+ * 同人创作 (Fanfic) — 专业级小说阅读/创作 APP 风格
+ * 设计：米色护眼底 / 衬线正文 / 极简点缀 / 阅读专注
+ * ===================================================================== */
+
+:root {
+    --ff-paper: #F6F1E7;
+    --ff-paper-2: #FBF7EE;
+    --ff-card: #FFFFFF;
+    --ff-card-soft: #FBF7EE;
+    --ff-ink: #2A2622;
+    --ff-text-main: #3D3833;
+    --ff-text-2: #6E665C;
+    --ff-text-3: #A39A8E;
+    --ff-line: rgba(61, 56, 51, 0.10);
+    --ff-line-soft: rgba(61, 56, 51, 0.05);
+    --ff-accent: #8C5A3F;          /* 古铜色：主操作 */
+    --ff-accent-soft: rgba(140, 90, 63, 0.10);
+    --ff-accent-deep: #6B4530;
+    --ff-danger: #B5524A;
+    --ff-danger-soft: rgba(181, 82, 74, 0.10);
+    --ff-shadow-card: 0 1px 2px rgba(61, 56, 51, 0.04), 0 8px 24px rgba(61, 56, 51, 0.04);
+    --ff-shadow-cap: 0 6px 20px rgba(61, 56, 51, 0.10);
+    --ff-font-serif: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "Source Han Serif", "STZhongsong", "FangSong", Georgia, serif;
+    --ff-font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif;
+    --ff-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================== 主容器 ============================== */
+#fanfic-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--ff-paper);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: var(--ff-font-ui);
+    -webkit-tap-highlight-color: transparent;
+    color: var(--ff-text-main);
+}
+#fanfic-screen.active { display: flex; }
+
+/* ============================== 顶部导航（三槽位真居中） ============================== */
+.ff-nav-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: calc(max(env(safe-area-inset-top), 16px) + 95px);
+    padding: max(env(safe-area-inset-top), 16px) 16px 12px;
+    background: linear-gradient(to bottom, var(--ff-paper) 60%, rgba(246, 241, 231, 0));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 110;
+    pointer-events: none;
+}
+
+.ff-nav-header > * { pointer-events: auto; }
+
+.ff-back-btn,
+.ff-nav-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--ff-line);
+    border-radius: 50%;
+    background: var(--ff-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(61, 56, 51, 0.04);
+    transition: transform 0.18s var(--ff-ease), background 0.18s;
+    padding: 0;
+    flex-shrink: 0;
+}
+.ff-back-btn:active,
+.ff-nav-icon-btn:active { transform: scale(0.94); background: var(--ff-card-soft); }
+.ff-back-btn svg,
+.ff-nav-icon-btn svg { width: 18px; height: 18px; stroke: var(--ff-text-main); stroke-width: 2; fill: none; }
+
+.ff-header-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ff-ink);
+    letter-spacing: 0.6px;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 右侧操作槽 = 38px 占位（与左侧返回按钮等宽），让中间标题真居中 */
+.ff-nav-actions {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* ============================== 滚动体 ============================== */
+.ff-scroll-body {
+    position: absolute;
+    inset: 0;
+    padding: calc(max(env(safe-area-inset-top), 16px) + 64px) 20px 110px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+}
+.ff-scroll-body::-webkit-scrollbar { display: none; }
+
+.ff-tab-content { display: none; animation: ffFade 0.32s ease; }
+.ff-tab-content.active { display: block; padding-bottom: 4px; }
+
+@keyframes ffFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================== 底部胶囊导航 ============================== */
+.ff-tab-bar {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(280px, calc(100% - 32px));
+    height: 56px;
+    background: var(--ff-card);
+    border: 1px solid var(--ff-line);
+    border-radius: 28px;
+    box-shadow: var(--ff-shadow-cap);
+    display: flex;
+    align-items: center;
+    z-index: 100;
+    padding: 4px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.ff-tab-item {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: none;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--ff-text-3);
+    cursor: pointer;
+    transition: all 0.25s var(--ff-ease);
+    font-family: inherit;
+}
+.ff-tab-item.active {
+    background: var(--ff-paper);
+    color: var(--ff-ink);
+}
+.ff-tab-item svg { width: 18px; height: 18px; stroke-width: 1.8; fill: none; stroke: currentColor; }
+.ff-tab-label { font-size: 13px; font-weight: 500; }
+
+/* ============================== 卡片基类 ============================== */
+.ff-card {
+    background: var(--ff-card);
+    border: 1px solid var(--ff-line-soft);
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--ff-shadow-card);
+}
+
+.ff-card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ff-text-3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ff-card-title svg { width: 14px; height: 14px; stroke: var(--ff-accent); stroke-width: 2; fill: none; }
+.ff-card-sub {
+    font-size: 11px;
+    color: var(--ff-text-3);
+    margin-top: 12px;
+    margin-bottom: 8px;
+    letter-spacing: 0.4px;
+}
+
+/* ============================== Chips ============================== */
+.ff-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ff-chip {
+    border: 1px solid var(--ff-line);
+    background: var(--ff-card);
+    color: var(--ff-text-2);
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s var(--ff-ease);
+    user-select: none;
+}
+.ff-chip:active { transform: scale(0.96); }
+.ff-chip.selected,
+.ff-chip:hover {
+    border-color: var(--ff-accent);
+    color: var(--ff-accent);
+    background: var(--ff-accent-soft);
+}
+.ff-chip.selected { font-weight: 600; }
+
+/* ============================== Row Toggle ============================== */
+.ff-row-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--ff-card);
+    border: 1px solid var(--ff-line-soft);
+    border-radius: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--ff-shadow-card);
+}
+.ff-row-left { display: flex; align-items: center; gap: 10px; }
+.ff-row-left svg { width: 16px; height: 16px; color: var(--ff-accent); stroke-width: 2; fill: none; }
+.ff-row-left span { font-size: 14px; color: var(--ff-text-main); font-weight: 500; }
+
+/* iOS 风 toggle */
+.ff-ios-switch {
+    position: relative;
+    width: 46px; height: 28px;
+    appearance: none; -webkit-appearance: none;
+    background: rgba(61, 56, 51, 0.16);
+    border-radius: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.25s;
+    flex-shrink: 0;
+    border: none;
+}
+.ff-ios-switch:checked { background: var(--ff-accent); }
+.ff-ios-switch::before {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 24px; height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    transition: transform 0.25s var(--ff-ease);
+}
+.ff-ios-switch:checked::before { transform: translateX(18px); }
+
+/* ============================== 输入区 ============================== */
+.ff-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ff-text-main);
+    font-family: inherit;
+    background: transparent;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: 0;
+}
+.ff-textarea::placeholder { color: var(--ff-text-3); }
+.ff-textarea-large { min-height: 96px; }
+
+/* ============================== 主按钮 ============================== */
+.ff-primary-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    background: var(--ff-accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    transition: all 0.2s var(--ff-ease);
+    box-shadow: 0 4px 14px rgba(140, 90, 63, 0.22);
+    letter-spacing: 1.5px;
+}
+.ff-primary-btn:active:not(:disabled) { transform: scale(0.98); background: var(--ff-accent-deep); }
+.ff-primary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.ff-primary-btn svg { width: 18px; height: 18px; stroke-width: 2; }
+
+.ff-primary-btn-compact {
+    margin-bottom: 0;
+    padding: 14px;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+/* spinner */
+.ff-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: ffSpin 0.7s linear infinite;
+    display: none;
+}
+.ff-spinner.visible { display: inline-block; }
+@keyframes ffSpin { to { transform: rotate(360deg); } }
+
+/* ============================== 阅读器 ============================== */
+.ff-reader {
+    background: var(--ff-paper-2);
+    border: 1px solid var(--ff-line-soft);
+    border-radius: 20px;
+    padding: 30px 24px 36px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(61, 56, 51, 0.04), 0 12px 32px rgba(61, 56, 51, 0.06);
+}
+
+.ff-reader-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--ff-line);
+    font-size: 11px;
+    color: var(--ff-text-3);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.ff-reader-meta-dot {
+    width: 3px; height: 3px; border-radius: 50%; background: var(--ff-text-3);
+}
+
+.ff-reader-title {
+    font-family: var(--ff-font-serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ff-ink);
+    line-height: 1.4;
+    margin-bottom: 18px;
+    letter-spacing: 0.4px;
+}
+
+.ff-reader-body {
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    line-height: 2;
+    color: var(--ff-ink);
+    letter-spacing: 0.3px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.ff-reader-body p { margin: 0 0 0.85em 0; text-indent: 2em; }
+.ff-reader-body p:last-child { margin-bottom: 0; }
+
+/* 编辑器 */
+.ff-editor-textarea {
+    width: 100%;
+    border: 1px solid var(--ff-line);
+    border-radius: 18px;
+    padding: 24px;
+    background: var(--ff-paper-2);
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    line-height: 2;
+    color: var(--ff-ink);
+    letter-spacing: 0.3px;
+    min-height: 220px;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+    box-shadow: var(--ff-shadow-card);
+    outline: none;
+    resize: none;
+    transition: border-color 0.18s var(--ff-ease), background 0.18s;
+}
+.ff-editor-textarea:focus {
+    background: #fff;
+    border-color: var(--ff-accent);
+    box-shadow: 0 0 0 3px var(--ff-accent-soft);
+}
+
+/* ============================== 阅读 Dock（浮动） ============================== */
+.ff-reader-dock {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(320px, calc(100% - 28px));
+    height: 56px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--ff-line);
+    border-radius: 28px;
+    box-shadow: var(--ff-shadow-cap);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    z-index: 105;
+    animation: ffDockIn 0.32s var(--ff-ease);
+}
+
+@keyframes ffDockIn {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.ff-dock-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    color: var(--ff-text-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s var(--ff-ease);
+    padding: 0;
+    flex-shrink: 0;
+}
+.ff-dock-btn:active { transform: scale(0.92); }
+.ff-dock-btn svg { width: 20px; height: 20px; stroke-width: 1.8; fill: none; }
+.ff-dock-btn.is-active { color: var(--ff-accent); }
+
+/* 收藏按钮：未激活只有描边，激活时填充实心 */
+.ff-dock-fav svg { fill: none; transition: fill 0.18s ease; }
+.ff-dock-fav.is-active svg { fill: currentColor; }
+
+.ff-dock-btn.ff-dock-primary {
+    width: 46px;
+    height: 46px;
+    background: var(--ff-accent);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(140, 90, 63, 0.34);
+}
+.ff-dock-btn.ff-dock-primary:active { background: var(--ff-accent-deep); }
+.ff-dock-btn.ff-dock-primary svg { stroke-width: 2; }
+
+/* ============================== 续写 Sheet ============================== */
+.ff-sheet-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 38, 34, 0.34);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: ffMaskIn 0.22s ease;
+}
+.ff-sheet-mask.show { display: flex; }
+@keyframes ffMaskIn { from { opacity: 0; } to { opacity: 1; } }
+
+.ff-sheet {
+    width: 100%;
+    max-width: 520px;
+    background: var(--ff-paper);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 36px rgba(42, 38, 34, 0.20);
+    display: flex;
+    flex-direction: column;
+    max-height: 78vh;
+    animation: ffSheetSlide 0.32s var(--ff-ease);
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+@keyframes ffSheetSlide {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+.ff-sheet-handle {
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: rgba(61, 56, 51, 0.18);
+    margin: 10px auto 4px;
+}
+.ff-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 8px;
+}
+.ff-sheet-title {
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ff-ink);
+    letter-spacing: 0.4px;
+}
+.ff-sheet-close {
+    width: 32px; height: 32px;
+    border: none; background: transparent;
+    color: var(--ff-text-2);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    padding: 0;
+}
+.ff-sheet-close:active { background: var(--ff-line); }
+.ff-sheet-close svg { width: 16px; height: 16px; }
+
+.ff-sheet-body {
+    padding: 4px 20px 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+.ff-sheet-section-label {
+    font-size: 11px;
+    color: var(--ff-text-3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 14px 2px 10px;
+    font-weight: 600;
+}
+.ff-sheet-section-label:first-child { margin-top: 4px; }
+
+.ff-sheet-meta {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ff-line-soft);
+    font-size: 12px;
+    color: var(--ff-text-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ff-sheet-meta label { display: flex; align-items: center; gap: 8px; }
+
+.ff-sheet-footer { padding: 8px 20px 0; }
+
+.ff-context-select {
+    border: 1px solid var(--ff-line);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--ff-text-main);
+    background: var(--ff-card-soft);
+    outline: none;
+    font-family: inherit;
+}
+
+.ff-continue-input {
+    width: 100%;
+    border: 1px solid var(--ff-line);
+    background: var(--ff-card-soft);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--ff-text-main);
+    font-family: inherit;
+    outline: none;
+    transition: 0.18s var(--ff-ease);
+    box-sizing: border-box;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+.ff-continue-input:focus {
+    background: #fff;
+    border-color: var(--ff-accent);
+    box-shadow: 0 0 0 3px var(--ff-accent-soft);
+}
+.ff-continue-input::placeholder { color: var(--ff-text-3); }
+
+/* ============================== 历史 Drawer ============================== */
+.ff-drawer-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 38, 34, 0.34);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: none;
+    animation: ffMaskIn 0.22s ease;
+}
+.ff-drawer-mask.show { display: block; }
+
+.ff-drawer {
+    position: absolute;
+    top: 0; bottom: 0;
+    right: 0;
+    width: min(360px, 88%);
+    background: var(--ff-paper);
+    box-shadow: -10px 0 36px rgba(42, 38, 34, 0.16);
+    display: flex;
+    flex-direction: column;
+    animation: ffDrawerSlide 0.32s var(--ff-ease);
+}
+@keyframes ffDrawerSlide {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+.ff-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: max(env(safe-area-inset-top), 16px) 18px 12px;
+    border-bottom: 1px solid var(--ff-line-soft);
+}
+.ff-drawer-title {
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ff-ink);
+}
+.ff-drawer-close {
+    width: 32px; height: 32px;
+    border: none; background: transparent;
+    color: var(--ff-text-2);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.ff-drawer-close:active { background: var(--ff-line); }
+.ff-drawer-close svg { width: 16px; height: 16px; }
+.ff-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 24px;
+}
+.ff-drawer-body .ff-history-item.is-current {
+    border-color: var(--ff-accent);
+    background: var(--ff-accent-soft);
+}
+
+/* ============================== 历史项 ============================== */
+.ff-history-section { margin-top: 24px; }
+.ff-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+.ff-section-title {
+    font-family: var(--ff-font-serif);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ff-text-2);
+    letter-spacing: 0.4px;
+}
+.ff-section-count { font-size: 11px; color: var(--ff-text-3); }
+
+.ff-history-item {
+    background: var(--ff-card);
+    border: 1px solid var(--ff-line-soft);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(61, 56, 51, 0.03);
+    cursor: pointer;
+    transition: all 0.18s var(--ff-ease);
+}
+.ff-history-item:active { transform: scale(0.99); background: var(--ff-card-soft); }
+.ff-history-item-body { flex: 1; min-width: 0; }
+.ff-history-item-tag {
+    font-size: 10px;
+    color: var(--ff-accent);
+    background: var(--ff-accent-soft);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    display: inline-block;
+    text-transform: uppercase;
+}
+.ff-history-item-preview {
+    font-family: var(--ff-font-serif);
+    font-size: 13.5px;
+    color: var(--ff-text-main);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.ff-history-item-meta {
+    font-size: 10px;
+    color: var(--ff-text-3);
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+}
+.ff-history-delete-btn {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border: none; background: none;
+    color: var(--ff-text-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 0;
+}
+.ff-history-delete-btn:hover { color: var(--ff-danger); }
+.ff-history-delete-btn:active { background: var(--ff-danger-soft); }
+.ff-history-delete-btn svg { width: 15px; height: 15px; stroke-width: 2; fill: none; }
+
+/* ============================== 书架 ============================== */
+.ff-bookshelf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 14px;
+    padding-top: 8px;
+}
+.ff-book-item { cursor: pointer; }
+.ff-book-cover {
+    aspect-ratio: 3/4;
+    border-radius: 6px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #E8DDC8 0%, #D9CAB0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 8px;
+    transition: transform 0.22s var(--ff-ease);
+    box-shadow: 2px 4px 12px rgba(61, 56, 51, 0.10), inset 0 0 0 1px rgba(255, 255, 255, 0.20);
+}
+.ff-book-cover:active { transform: scale(0.96) rotate(-1deg); }
+.ff-book-cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+}
+.ff-book-cover-text {
+    font-family: var(--ff-font-serif);
+    color: rgba(61, 56, 51, 0.65);
+    text-align: center;
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.ff-book-spine {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 0;
+    width: 5px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+    pointer-events: none;
+}
+.ff-book-title {
+    font-family: var(--ff-font-serif);
+    font-size: 12px;
+    color: var(--ff-text-main);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* ============================== 空状态 ============================== */
+.ff-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 30px;
+    text-align: center;
+}
+.ff-empty-state svg {
+    width: 56px; height: 56px;
+    color: var(--ff-text-3);
+    margin-bottom: 18px;
+    stroke-width: 1.4;
+    fill: none;
+}
+.ff-empty-state p {
+    font-size: 13px;
+    color: var(--ff-text-3);
+    line-height: 1.7;
+}
+.ff-empty-state strong {
+    display: block;
+    font-family: var(--ff-font-serif);
+    font-size: 16px;
+    color: var(--ff-text-2);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* ============================== Toast ============================== */
+.ff-toast {
+    position: fixed;
+    top: calc(max(env(safe-area-inset-top), 16px) + 70px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    background: rgba(42, 38, 34, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    z-index: 10002;
+    opacity: 0;
+    transition: all 0.28s var(--ff-ease);
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: 0.4px;
+}
+.ff-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============================== Action Sheet ============================== */
+.ff-action-sheet-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 38, 34, 0.40);
+    backdrop-filter: blur(4px);
+    z-index: 10003;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.ff-action-sheet-mask.show { display: flex; }
+.ff-action-sheet {
+    width: calc(100% - 16px);
+    max-width: 400px;
+    margin-bottom: max(8px, env(safe-area-inset-bottom));
+    animation: ffSheetSlide 0.3s var(--ff-ease);
+}
+.ff-action-sheet-group {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.ff-action-sheet-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: var(--ff-accent);
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+    border-bottom: 0.5px solid rgba(61, 56, 51, 0.10);
+}
+.ff-action-sheet-btn:last-child { border-bottom: none; }
+.ff-action-sheet-btn.destructive { color: var(--ff-danger); }
+.ff-action-sheet-cancel {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+}
+.ff-action-sheet-cancel .ff-action-sheet-btn {
+    font-weight: 600;
+    border-bottom: none;
+    color: var(--ff-text-main);
+}
+
+/* ============================== Onboarding 教程 ============================== */
+.ff-tour-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 38, 34, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10010;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.24s ease;
+}
+.ff-tour-mask.show { display: flex; opacity: 1; }
+
+.ff-tour-card {
+    background: var(--ff-paper-2);
+    border-radius: 22px;
+    width: 100%;
+    max-width: 360px;
+    padding: 26px 24px 22px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.30);
+    transform: translateY(12px);
+    opacity: 0;
+    animation: ffTourIn 0.36s var(--ff-ease) 0.04s forwards;
+}
+@keyframes ffTourIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.ff-tour-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+.ff-tour-dot {
+    flex: 1;
+    height: 3px;
+    background: rgba(61, 56, 51, 0.14);
+    border-radius: 2px;
+    transition: background 0.28s;
+}
+.ff-tour-dot.active { background: var(--ff-accent); }
+
+.ff-tour-title {
+    font-family: var(--ff-font-serif);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ff-ink);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+.ff-tour-body {
+    font-size: 14px;
+    color: var(--ff-text-2);
+    line-height: 1.7;
+    min-height: 60px;
+}
+.ff-tour-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 22px;
+}
+.ff-tour-skip {
+    border: none;
+    background: transparent;
+    color: var(--ff-text-3);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 100px;
+    font-family: inherit;
+    letter-spacing: 0.4px;
+}
+.ff-tour-skip:active { background: var(--ff-line); }
+.ff-tour-next {
+    border: none;
+    background: var(--ff-accent);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 22px;
+    border-radius: 100px;
+    font-family: inherit;
+    letter-spacing: 0.6px;
+    box-shadow: 0 4px 12px rgba(140, 90, 63, 0.25);
+    transition: all 0.18s var(--ff-ease);
+}
+.ff-tour-next:active { transform: scale(0.97); background: var(--ff-accent-deep); }
+
+/* ============================== 杂项 ============================== */
+.ff-hidden-file-input { display: none !important; }
+.ff-persona-preview { display: none !important; }
+
+/* ============================== 暗色模式 ============================== */
+.phone-frame.dark-mode #fanfic-screen {
+    background: #1A1614;
+    color: #D8CEBE;
+    --ff-paper: #1A1614;
+    --ff-paper-2: #221C18;
+    --ff-card: #262019;
+    --ff-card-soft: #2C251D;
+    --ff-ink: #E8DBC4;
+    --ff-text-main: #C9BCA4;
+    --ff-text-2: #998D77;
+    --ff-text-3: #6B604E;
+    --ff-line: rgba(255, 255, 255, 0.06);
+    --ff-line-soft: rgba(255, 255, 255, 0.04);
+    --ff-accent: #C99775;
+    --ff-accent-soft: rgba(201, 151, 117, 0.14);
+    --ff-accent-deep: #B68762;
+}
+
+.phone-frame.dark-mode .ff-reader-dock {
+    background: rgba(38, 32, 25, 0.92);
+}
+
+.phone-frame.dark-mode .ff-tour-card,
+.phone-frame.dark-mode .ff-sheet,
+.phone-frame.dark-mode .ff-drawer {
+    background: #221C18;
+}
+
+.phone-frame.dark-mode .ff-action-sheet-group,
+.phone-frame.dark-mode .ff-action-sheet-cancel {
+    background: rgba(38, 32, 25, 0.96);
+    color: #D8CEBE;
+}
+.phone-frame.dark-mode .ff-action-sheet-btn {
+    color: var(--ff-accent);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}

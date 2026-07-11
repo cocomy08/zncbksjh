@@ -1,0 +1,700 @@
+/* ================================================================
+   7 SHOP - Ceramic Edition CSS
+   陶瓷质感设计系统
+   ================================================================ */
+
+/* === Design Language Variables === */
+.ceramic-shop-screen {
+  --ceramic-bg: #F4F4F6;
+  --ceramic-text-primary: #1D1D1F;
+  --ceramic-text-secondary: #86868B;
+  --ceramic-accent: #007AFF;
+  --ceramic-accent-red: #FF3B30;
+  
+  /* 陶瓷质感阴影 */
+  --ceramic-shadow-card: 
+    0 1px 2px rgba(0,0,0,0.04), 
+    0 4px 12px rgba(0,0,0,0.02),
+    0 0 0 1px rgba(0,0,0,0.02);
+  
+  /* 悬浮阴影 */
+  --ceramic-shadow-float: 
+    0 20px 40px -8px rgba(0,0,0,0.12),
+    0 0 0 1px rgba(255,255,255,0.6) inset;
+
+  --ceramic-ease-spring: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* === Base Screen Styles === */
+/* === Base Screen Styles === */
+#shop-screen.ceramic-shop-screen {
+  background-color: var(--ceramic-bg);
+  /* 噪点纹理背景 */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  display: flex;
+  flex-direction: column;
+  position: absolute; /* 关键修复：改为 absolute 以便正确覆盖 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* 默认隐藏状态 */
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transform: scale(0.95);
+  transition: opacity 0.4s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* 激活状态 */
+.phone-frame.show-shop #shop-screen.ceramic-shop-screen {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
+  transform: scale(1);
+}
+
+/* === View Management === */
+.shop-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+  transition: all 0.5s var(--ceramic-ease-spring);
+  z-index: 0;
+  overflow: hidden; /* Fix for iOS PWA scrolling isolation */
+}
+
+.shop-view.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+  z-index: 10;
+}
+
+/* === Shared Header === */
+.ceramic-header {
+  padding: 16px 24px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+  background: transparent;
+  flex-shrink: 0;
+  padding-top: 60px;
+}
+
+.ceramic-header-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-header-title span {
+  color: var(--ceramic-accent);
+}
+
+.ceramic-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: var(--ceramic-shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ceramic-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ceramic-icon-btn:active {
+  transform: scale(0.9);
+}
+
+.ceramic-icon-btn.avatar-btn {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ceramic-icon-btn.avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === Category Tabs === */
+.ceramic-category-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 24px 16px;
+  scroll-behavior: smooth;
+  z-index: 20;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: auto;
+}
+
+.ceramic-category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ceramic-category-tab {
+  padding: 10px 20px;
+  border-radius: 99px;
+  border: none;
+  background: #fff;
+  color: var(--ceramic-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  transition: all 0.3s var(--ceramic-ease-spring);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ceramic-category-tab.active {
+  background: var(--ceramic-text-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: scale(1.05);
+}
+
+/* === Content Scroll Area === */
+.ceramic-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 120px;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important; /* Prevent scroll chaining */
+  overscroll-behavior: contain !important;
+}
+
+.ceramic-content-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* === Product Grid === */
+.ceramic-product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* === Product Card === */
+.ceramic-product-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 12px;
+  box-shadow: var(--ceramic-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.ceramic-product-card:active {
+  transform: scale(0.97);
+}
+
+.ceramic-product-img-box {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #F5F5F7;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ceramic-product-img-box svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.3;
+  stroke: var(--ceramic-text-secondary);
+}
+
+.ceramic-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ceramic-product-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ceramic-text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ceramic-product-brand {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ceramic-accent);
+  background: rgba(0, 122, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.ceramic-product-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ceramic-text-primary);
+  font-family: "SF Mono", ui-monospace, monospace;
+  letter-spacing: -0.05em;
+}
+
+.ceramic-add-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ceramic-text-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.ceramic-add-btn:active {
+  transform: scale(0.9);
+  background: var(--ceramic-accent);
+}
+
+.ceramic-add-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* === Dashboard Grid (My Zone) === */
+.ceramic-dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 10px;
+}
+
+/* User Card */
+.ceramic-user-card {
+  background: #fff;
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: var(--ceramic-shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ceramic-user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: #eee;
+  object-fit: cover;
+}
+
+.ceramic-user-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-user-role {
+  font-size: 14px;
+  color: var(--ceramic-text-secondary);
+}
+
+/* Stat Cards Row */
+.ceramic-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ceramic-stat-card {
+  background: #fff;
+  border-radius: 28px;
+  padding: 20px;
+  height: 160px;
+  box-shadow: var(--ceramic-shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ceramic-stat-card:active {
+  transform: scale(0.96);
+}
+
+.ceramic-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #F5F5F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ceramic-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ceramic-stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-stat-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  opacity: 0.3;
+}
+
+.ceramic-stat-bg-icon {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  opacity: 0.1;
+}
+
+/* Blue Stat Card */
+.ceramic-stat-card.blue {
+  background: #EAF4FF;
+}
+
+.ceramic-stat-card.blue .ceramic-stat-icon {
+  background: #D6E8FF;
+  color: var(--ceramic-accent);
+}
+
+/* Black Stat Card */
+.ceramic-stat-card.black {
+  background: #1D1D1F;
+  color: #fff;
+}
+
+.ceramic-stat-card.black .ceramic-stat-icon {
+  background: #333;
+  color: #fff;
+}
+
+.ceramic-stat-card.black .ceramic-stat-label {
+  color: rgba(255,255,255,0.6);
+}
+
+.ceramic-stat-card.black .ceramic-stat-value {
+  color: #fff;
+}
+
+/* === Bottom Navigation Dock === */
+.ceramic-nav-dock-container {
+  position: absolute;
+  bottom: 32px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.ceramic-nav-capsule {
+  pointer-events: auto;
+  background: rgba(29, 29, 31, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 6px;
+  border-radius: 99px;
+  display: flex;
+  gap: 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.ceramic-nav-btn {
+  width: 100px;
+  height: 44px;
+  border-radius: 99px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.ceramic-nav-btn.active {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+}
+
+.ceramic-nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ceramic-nav-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,0.1);
+  margin: 10px 0;
+  align-self: center;
+}
+
+/* === Dark Mode Support === */
+.phone-frame.dark-mode .ceramic-shop-screen {
+  --ceramic-bg: #1C1C1E;
+  --ceramic-text-primary: #F5F5F7;
+  --ceramic-text-secondary: #8E8E93;
+}
+
+.phone-frame.dark-mode #shop-screen.ceramic-shop-screen {
+  background-color: var(--ceramic-bg);
+}
+
+.phone-frame.dark-mode .ceramic-icon-btn {
+  background: #2C2C2E;
+  color: #fff;
+}
+
+.phone-frame.dark-mode .ceramic-category-tab {
+  background: #2C2C2E;
+  color: var(--ceramic-text-secondary);
+}
+
+.phone-frame.dark-mode .ceramic-category-tab.active {
+  background: #fff;
+  color: #000;
+}
+
+.phone-frame.dark-mode .ceramic-product-card {
+  background: #2C2C2E;
+}
+
+.phone-frame.dark-mode .ceramic-product-img-box {
+  background: #3A3A3C;
+}
+
+.phone-frame.dark-mode .ceramic-product-name {
+  color: #fff;
+}
+
+.phone-frame.dark-mode .ceramic-product-price {
+  color: #fff;
+}
+
+.phone-frame.dark-mode .ceramic-add-btn {
+  background: #fff;
+  color: #000;
+}
+
+.phone-frame.dark-mode .ceramic-user-card {
+  background: #2C2C2E;
+}
+
+.phone-frame.dark-mode .ceramic-stat-card {
+  background: #2C2C2E;
+}
+
+.phone-frame.dark-mode .ceramic-stat-card.blue {
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.phone-frame.dark-mode .ceramic-stat-card.blue .ceramic-stat-icon {
+  background: rgba(0, 122, 255, 0.3);
+}
+
+/* === Sub-screen Visibility control (Vertical Overlay) === */
+.phone-frame.show-cart #cart-screen,
+.phone-frame.show-orders #orders-screen {
+  transform: translateY(0) !important;
+}
+
+#cart-screen, #orders-screen {
+  transform: translateY(100%); /* 默认向下隐藏 */
+  background: var(--ceramic-bg); /* 确保背景不透明 */
+  z-index: 50;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* === Checkout Bar (Floating) === */
+.ceramic-checkout-bar {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+  border-top: 1px solid rgba(255,255,255,0.5);
+  z-index: 100;
+}
+
+.ceramic-checkout-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ceramic-checkout-label {
+  font-size: 12px;
+  color: var(--ceramic-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ceramic-checkout-total {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: 'SF Mono', monospace;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-checkout-btn {
+  background: var(--ceramic-text-primary);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.ceramic-checkout-btn:active {
+  transform: scale(0.95);
+}
+
+/* === Cart Item Enhancements === */
+.ceramic-cart-item {
+  background: #fff;
+  padding: 16px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.ceramic-cart-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #F5F5F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+}
+
+.ceramic-qty-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F5F5F7;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.ceramic-qty-btn {
+  border: none;
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ceramic-text-primary);
+}
+
+.ceramic-qty-val {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* === Order Item Enhancements === */
+.ceramic-order-item {
+  background: #fff;
+  padding: 16px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.ceramic-order-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar { 
+  display: none; 
+}
+.hide-scrollbar { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}

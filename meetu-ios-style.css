@@ -1,0 +1,104 @@
+/* === iOS Style Meetu Card Design === */
+
+#meetu-style-list .playlist-item {
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    padding: 16px;
+    padding-right: 110px; /* Space for top-right buttons */
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+#meetu-style-list .playlist-item:active {
+    transform: scale(0.99);
+}
+
+.style-card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.style-card-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1c1c1e;
+    margin-bottom: 6px;
+}
+
+.style-card-desc {
+    font-size: 13px;
+    color: #8a8a8e;
+    line-height: 1.5;
+    /* Limit lines if needed */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* === Top Right Circular Action Buttons === */
+.card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.action-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+    background: #f2f2f7; /* Default gray bg */
+    padding: 0;
+}
+
+.action-circle:active {
+    transform: scale(0.9);
+}
+
+.action-circle svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+/* 1. Edit Button (Blue) */
+.action-circle.edit-btn {
+    background-color: rgba(0, 122, 255, 0.1);
+    color: #007AFF;
+}
+
+/* 2. Delete Button (Red) */
+.action-circle.delete-btn {
+    background-color: rgba(255, 59, 48, 0.1);
+    color: #FF3B30;
+}
+
+/* 3. Activate Button (Toggle) */
+.action-circle.toggle-btn {
+    background-color: #E5E5EA; /* iOS Gray 5 */
+    color: #8E8E93;
+}
+
+.action-circle.toggle-btn.active {
+    background-color: #34C759; /* iOS Green */
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
+}
+
+/* No switch styling needed anymore, using buttons */
+.style-switch { display: none !important; }
+
+/* Hide badge */
+.active-badge { display: none !important; }

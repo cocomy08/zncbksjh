@@ -1,0 +1,180 @@
+/* === Shopping App iOS 16 Premium Theme === */
+
+/* --- Category Tabs (Segmented Control / Pills) --- */
+.category-tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 12px 16px;
+    gap: 12px;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: sticky;
+    top: 90px; /* Adjust based on header height */
+    z-index: 10;
+}
+
+.category-tabs::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+/* Tab Item */
+.category-tab {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #8e8e93; /* iOS Gray */
+    background: #f2f2f7; /* iOS Light Gray */
+    border: none;
+    transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    cursor: pointer;
+}
+
+.category-tab.active {
+    background: #000000;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+}
+
+/* --- Product Grid --- */
+.product-grid-shop {
+    display: grid;
+    margin-top:30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 16px;
+    padding-bottom: 100px; /* Space for bottom bar */
+}
+
+/* Product Card */
+.product-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+    border: none; /* Remove any previous borders */
+}
+
+.product-card:active {
+    transform: scale(0.98);
+}
+
+/* Image Area */
+.product-image-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 10px;
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s;
+}
+
+/* Info Content */
+.product-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.product-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c1c1e;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+}
+
+.product-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto; /* Push to bottom */
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #007aff; /* iOS Blue */
+    letter-spacing: -0.5px;
+}
+
+/* Buy Button (Mini) */
+.product-buy-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f2f2f7;
+    color: #007aff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.product-buy-btn:active {
+    background: #e5e5ea;
+}
+
+.product-buy-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dark Mode Support */
+.phone-frame.dark-mode .category-tabs {
+    background: #000;
+    border-color: rgba(255,255,255,0.1);
+}
+
+.phone-frame.dark-mode .category-tab {
+    background: #1c1c1e;
+    color: #8e8e93;
+}
+
+.phone-frame.dark-mode .category-tab.active {
+    background: #ffffff;
+    color: #000000;
+}
+
+.phone-frame.dark-mode .product-grid-shop {
+    background: #000;
+}
+
+.phone-frame.dark-mode .product-card {
+    background: #1c1c1e;
+    box-shadow: none;
+}
+
+.phone-frame.dark-mode .product-name {
+    color: #fff;
+}
+
+.phone-frame.dark-mode .product-buy-btn {
+    background: #2c2c2e;
+    color: #0a84ff;
+}

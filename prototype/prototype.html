@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Settings Prototype - Refined</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 审美核心：字体与基础色调 
+           使用 -apple-system 确保在 iOS 上调用原生旧金山字体 (San Francisco)
+        */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: #F4F4F5; /* 更偏中性的 Zinc Gray，比之前的 F2F2F7 更现代 */
+            color: #09090b; /* Zinc-950，比纯黑更柔和的高级黑 */
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: -0.015em; /* 稍微收紧字间距，增加精致感 */
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 页面转场：增加一点景深缩放逻辑
+        */
+        .page {
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s ease;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto;
+            background-color: #F4F4F5;
+            transform: translateX(100%);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none; /* 隐藏时不可点击 */
+        }
+
+        .page.active {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 微交互：点击态
+           模拟物理按压，只有微小的 Scale，没有透明度变化，显得更有质感
+        */
+        .card-interaction {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease;
+        }
+        .card-interaction:active {
+            transform: scale(0.96);
+        }
+
+        /* 精致卡片样式 (Ceramic Look)
+           关键在于：极淡的边框 + 极淡的阴影
+        */
+        .premium-card {
+            background-color: #FFFFFF;
+            /* 1px 极淡边框，消除塑料感，增加实体感 */
+            border: 1px solid rgba(0, 0, 0, 0.06); 
+            /* 极其克制的阴影，只负责把卡片托起来一点点 */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        /* 图标容器样式 
+           使用浅灰色背景而非彩色，达成 Bauhaus 风格
+        */
+        .icon-container {
+            background-color: #F4F4F5; /* Zinc-100 */
+            border: 1px solid rgba(0,0,0,0.03);
+            color: #18181b; /* Zinc-900 */
+        }
+
+        /* Toggle Switch - 保持绿色作为唯一的系统级强调色 */
+        .toggle-checkbox:checked { right: 0; border-color: #34C759; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background-color: rgba(244, 244, 245, 0.85);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="antialiased h-screen overflow-hidden selection:bg-gray-200">
+
+    <!-- 主界面 -->
+    <div id="main-view" class="h-full w-full max-w-md mx-auto relative flex flex-col transition-all duration-500 ease-[cubic-bezier(0.32,0.725,0,1)]">
+        
+        <!-- Header: 增加一点留白，字体更黑更重 -->
+        <header class="pt-14 pb-6 px-6 flex justify-between items-end">
+            <h1 class="text-[34px] leading-tight font-bold text-black tracking-tight">Settings</h1>
+            <!-- 增加一个极简的用户头像或状态指示，平衡视觉 -->
+            <div class="w-8 h-8 rounded-full bg-gray-200 border border-white shadow-sm flex items-center justify-center mb-1">
+                <i data-lucide="user" class="w-4 h-4 text-gray-500"></i>
+            </div>
+        </header>
+
+        <!-- 搜索框: 更加融合背景，减少突兀感 -->
+        <div class="px-6 mb-8">
+            <div class="bg-white/60 backdrop-blur-md border border-black/5 rounded-xl flex items-center px-4 py-3 shadow-sm transition-colors focus-within:bg-white focus-within:ring-1 focus-within:ring-black/5">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-3"></i>
+                <input type="text" placeholder="Search..." class="bg-transparent w-full text-[15px] placeholder-gray-400 focus:outline-none text-gray-800 font-medium">
+            </div>
+        </div>
+
+        <!-- 核心网格 -->
+        <div class="flex-1 overflow-y-auto px-6 pb-12 hide-scrollbar">
+            <!-- Grid 间距调整为 12px，更紧凑 -->
+            <div class="grid grid-cols-2 gap-[12px]">
+                
+                <!-- Card 1: Model -->
+                <div onclick="openPage('page-model')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px]">
+                    <div class="flex justify-between items-start">
+                        <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center">
+                            <i data-lucide="cpu" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Model</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">Brain & API</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: AI Behavior (High Priority) -->
+                <div onclick="openPage('page-behavior')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px] relative overflow-hidden">
+                    <!-- 稍微加一点背景装饰，区分核心功能，但保持黑白 -->
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-[60px] opacity-50 pointer-events-none"></div>
+                    
+                    <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center relative z-10">
+                        <i data-lucide="sparkles" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Behavior</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">Auto-reply & Memory</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Appearance -->
+                <div onclick="openPage('page-appearance')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px]">
+                    <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center">
+                        <i data-lucide="palette" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Appearance</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">Theme & Layout</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Voice -->
+                <div onclick="openPage('page-voice')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px]">
+                    <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center">
+                        <i data-lucide="mic" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Voice</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">TTS & Input</p>
+                    </div>
+                </div>
+
+                <!-- Card 5: System (Experimental) -->
+                <div onclick="openPage('page-system')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px]">
+                    <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center">
+                        <i data-lucide="flask-conical" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Labs</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">iOS Features</p>
+                    </div>
+                </div>
+
+                <!-- Card 6: Data -->
+                <div onclick="openPage('page-data')" class="premium-card p-5 rounded-[24px] card-interaction cursor-pointer flex flex-col justify-between h-[168px]">
+                    <div class="w-11 h-11 rounded-[14px] icon-container flex items-center justify-center">
+                        <i data-lucide="database" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-[17px] mb-1 text-gray-900">Data</h3>
+                        <p class="text-[13px] text-gray-500 font-medium tracking-wide">Backup & Sync</p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 mb-2 text-center">
+                 <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200/50 border border-gray-200/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span>
+                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">System Online</span>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 子页面 1: Behavior (极简风格) -->
+    <!-- ============================================ -->
+    <div id="page-behavior" class="page max-w-md mx-auto">
+        <div class="sticky top-0 z-10 nav-blur px-5 h-14 flex items-center justify-between">
+            <button onclick="closePage('page-behavior')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-black">
+                <i data-lucide="arrow-left" class="w-5 h-5 stroke-[2]"></i>
+            </button>
+            <span class="text-[15px] font-semibold text-gray-900">AI Behavior</span>
+            <div class="w-9"></div>
+        </div>
+
+        <div class="p-5 space-y-8">
+            <!-- Section 1 -->
+            <section>
+                <h4 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Interaction</h4>
+                <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm overflow-hidden">
+                    
+                    <div class="flex items-center justify-between p-4 border-b border-gray-50/80">
+                        <div class="flex flex-col">
+                            <span class="text-[16px] font-medium text-gray-900">Proactive Message</span>
+                            <span class="text-[13px] text-gray-400 mt-0.5">Allow AI to initiate chat</span>
+                        </div>
+                        <div class="relative inline-block w-11 h-6 align-middle select-none">
+                            <input type="checkbox" id="toggle-active" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border border-gray-200 appearance-none cursor-pointer transition-all duration-300 top-0.5 left-0.5"/>
+                            <label for="toggle-active" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 active:bg-gray-50 transition-colors cursor-pointer">
+                        <span class="text-[16px] font-medium text-gray-900">Frequency</span>
+                        <div class="flex items-center">
+                            <span class="text-[15px] text-gray-400 mr-2">Normal</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+             <section>
+                <h4 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Context</h4>
+                <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between p-4">
+                        <div class="flex flex-col">
+                            <span class="text-[16px] font-medium text-gray-900">Long-term Memory</span>
+                            <span class="text-[13px] text-gray-400 mt-0.5">Use vector database</span>
+                        </div>
+                        <div class="relative inline-block w-11 h-6 align-middle select-none">
+                            <input type="checkbox" checked id="toggle-mem" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border border-gray-200 appearance-none cursor-pointer transition-all duration-300 top-0.5 left-0.5"/>
+                            <label for="toggle-mem" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 子页面 2: Labs (iOS) -->
+    <!-- ============================================ -->
+    <div id="page-system" class="page max-w-md mx-auto">
+        <div class="sticky top-0 z-10 nav-blur px-5 h-14 flex items-center justify-between">
+            <button onclick="closePage('page-system')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-black">
+                <i data-lucide="arrow-left" class="w-5 h-5 stroke-[2]"></i>
+            </button>
+            <span class="text-[15px] font-semibold text-gray-900">Labs</span>
+            <div class="w-9"></div>
+        </div>
+
+        <div class="p-5 space-y-8">
+            <section>
+                <h4 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">iOS Native</h4>
+                <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-50/80">
+                        <span class="text-[16px] font-medium text-gray-900">PWA Immersive</span>
+                        <div class="relative inline-block w-11 h-6 align-middle select-none">
+                            <input type="checkbox" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border border-gray-200 appearance-none cursor-pointer transition-all duration-300 top-0.5 left-0.5"/>
+                            <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-[16px] font-medium text-gray-900">Haptics</span>
+                        <div class="relative inline-block w-11 h-6 align-middle select-none">
+                            <input type="checkbox" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border border-gray-200 appearance-none cursor-pointer transition-all duration-300 top-0.5 left-0.5"/>
+                            <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section>
+                <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm overflow-hidden flex flex-col items-center justify-center p-6 space-y-4">
+                    <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-2">
+                        <i data-lucide="box" class="w-8 h-8 text-gray-300"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[15px] font-medium text-gray-900">Version 2.0.1</p>
+                        <p class="text-[13px] text-gray-400 mt-1">Build 240502.1120</p>
+                    </div>
+                    <button class="w-full py-3 mt-2 text-[15px] font-medium text-red-500 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
+                        Clear Cache
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- 占位页面，保持逻辑完整 -->
+    <div id="page-model" class="page">
+        <div class="h-full flex items-center justify-center text-gray-400" onclick="closePage('page-model')">Tap to close</div>
+    </div>
+    <div id="page-appearance" class="page">
+        <div class="h-full flex items-center justify-center text-gray-400" onclick="closePage('page-appearance')">Tap to close</div>
+    </div>
+    <div id="page-voice" class="page">
+        <div class="h-full flex items-center justify-center text-gray-400" onclick="closePage('page-voice')">Tap to close</div>
+    </div>
+    <div id="page-data" class="page">
+        <div class="h-full flex items-center justify-center text-gray-400" onclick="closePage('page-data')">Tap to close</div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function openPage(pageId) {
+            const page = document.getElementById(pageId);
+            const mainView = document.getElementById('main-view');
+            
+            if(page) {
+                page.classList.add('active');
+                // 3D 缩放退后效果，增加纵深感
+                mainView.style.transform = "scale(0.92) translateY(10px)";
+                mainView.style.opacity = "0.6";
+                mainView.style.filter = "grayscale(100%)"; // 背景变灰，聚焦当前页
+            }
+        }
+
+        function closePage(pageId) {
+            const page = document.getElementById(pageId);
+            const mainView = document.getElementById('main-view');
+            
+            if(page) {
+                page.classList.remove('active');
+                mainView.style.transform = "scale(1) translateY(0)";
+                mainView.style.opacity = "1";
+                mainView.style.filter = "grayscale(0%)";
+            }
+        }
+        
+        // 绑定所有 Toggle，增加点击震动反馈模拟 (需在真机测试)
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', () => {
+                if(window.navigator && window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

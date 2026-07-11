@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Wowo</title>
+    <style>
+        /* --- 0. 基础设定 --- */
+        :root {
+            --bg-color: #FDFBF7; /* 暖调米纸色 */
+            --accent-pink: #FFB7B2;
+            --accent-green: #E2F0CB;
+            --accent-purple: #E0BBE4;
+            --accent-yellow: #FFF9C4;
+            --text-main: #6D5D6E; /* 柔和紫灰，代替纯黑 */
+            --text-light: #A493A4;
+            --shadow-paper: 0 4px 20px rgba(100, 80, 100, 0.08);
+            --font-hand: "Comic Sans MS", "Chalkboard SE", sans-serif; /* 模拟手写感 */
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Nunito", sans-serif;
+            color: var(--text-main);
+            height: 100vh; overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- 1. 底部悬浮导航 (Floating Glass) --- */
+        .tab-bar {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 40px; /* 胶囊形状 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1; text-align: center; opacity: 0.4;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.9);
+        }
+        .tab-item.active { opacity: 1; transform: scale(1.1); }
+        .tab-icon { width: 24px; height: 24px; fill: var(--text-main); }
+        
+        /* --- 2. 页面容器 --- */
+        .page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 24px 24px 100px 24px; /* 底部留白给Tab */
+            box-sizing: border-box;
+            overflow-y: auto; overflow-x: hidden;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .page.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .page::-webkit-scrollbar { display: none; }
+
+        .page-title {
+            font-family: var(--font-hand);
+            font-size: 28px; font-weight: bold; color: var(--text-main);
+            margin: 20px 0 30px 0;
+        }
+
+        /* ============ Page 1: 纪念日 (极简海报) ============ */
+        #page-love {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle at top right, #FFF0F5 0%, transparent 40%);
+        }
+        .love-card {
+            text-align: center; position: relative;
+        }
+        .days-big {
+            font-size: 110px; font-weight: 800; color: var(--accent-pink);
+            line-height: 0.9; letter-spacing: -4px;
+            text-shadow: 4px 4px 0px #FFF;
+        }
+        .days-label {
+            font-family: var(--font-hand); font-size: 18px; margin-top: 10px;
+            background: #FFF; padding: 4px 12px; border-radius: 12px;
+            transform: rotate(-2deg); display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* ============ Page 2: 生理期 (柔软Blob) ============ */
+        .cycle-container {
+            position: relative; width: 100%; height: 300px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+        }
+        /* 动态呼吸的Blob背景 */
+        .blob-bg {
+            position: absolute; width: 200px; height: 200px;
+            background: #FFE4E1; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            animation: morph 6s ease-in-out infinite; z-index: 0;
+        }
+        @keyframes morph {
+            0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+            50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1.05); }
+        }
+
+        .cycle-content { z-index: 1; text-align: center; }
+        .cycle-day { font-size: 48px; font-weight: bold; color: #D86B6B; }
+        .cycle-status { font-size: 14px; color: #BC8F8F; margin-top: 4px; }
+        
+        /* 隐形日期设置 */
+        .date-trigger {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 12px; background: #FFF; padding: 6px 12px;
+            border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            color: #999;
+        }
+        #date-input { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
+
+        /* 记录按钮 */
+        .btn-soft {
+            width: 100%; background: #FFF; border: none; padding: 18px;
+            border-radius: 20px; font-size: 16px; color: var(--text-main);
+            box-shadow: var(--shadow-paper); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: transform 0.1s;
+        }
+        .btn-soft:active { transform: scale(0.98); }
+
+        /* ============ Page 3: 打卡 (交换日记本) ============ */
+        .journal-card {
+            background: #FFF; border-radius: 2px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 24px; position: relative;
+            /* 纸张纹理 */
+            background-image: linear-gradient(#F5F5F5 1px, transparent 1px);
+            background-size: 100% 40px; /* 模拟横线 */
+        }
+        /* 顶部夹子效果 */
+        .journal-card::before {
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 20px; background: #E0E0E0;
+            border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-family: var(--font-hand); font-size: 18px; line-height: 1.6;
+            color: #555; margin-bottom: 30px; margin-top: 10px;
+        }
+
+        /* 隐形输入框，文字落在横线上 */
+        .journal-input {
+            width: 100%; height: 120px; background: transparent;
+            border: none; outline: none; resize: none;
+            font-size: 16px; line-height: 40px; /* 对齐背景横线 */
+            color: var(--text-main); font-family: inherit;
+        }
+
+        /* 心情选择区 (SVG Custom) */
+        .mood-section { margin-top: 20px; border-top: 2px dashed #EEE; padding-top: 20px; }
+        .mood-title { font-size: 12px; color: #AAA; text-align: center; margin-bottom: 15px; }
+        .mood-row { display: flex; justify-content: space-between; padding: 0 10px; }
+        
+        .mood-opt {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            cursor: pointer; opacity: 0.5; transition: all 0.3s;
+        }
+        .mood-opt.selected { opacity: 1; transform: scale(1.1); }
+        .mood-svg { width: 40px; height: 40px; } /* SVG容器 */
+        
+        .btn-post {
+            background: var(--text-main); color: #FFF; width: 100%;
+            padding: 15px; border-radius: 50px; border: none;
+            margin-top: 20px; font-weight: bold; font-size: 14px;
+            box-shadow: 0 5px 15px rgba(109, 93, 110, 0.3);
+        }
+
+        /* ============ Page 4: 小声贴 (Washi Tape 风格) ============ */
+        .waterfall { columns: 2; column-gap: 15px; }
+        
+        .sticky-note {
+            break-inside: avoid; margin-bottom: 20px;
+            padding: 20px 15px; background: #FFF;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.05);
+            font-family: var(--font-hand); font-size: 14px; line-height: 1.5;
+            position: relative; color: #555;
+        }
+        
+        /* 和纸胶带效果 */
+        .tape {
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-1deg);
+            width: 40px; height: 12px;
+            background-color: rgba(224, 187, 228, 0.6); /* 半透明紫 */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        /* 给不同的便签换胶带颜色 */
+        .sticky-note:nth-child(2n) .tape { background-color: rgba(226, 240, 203, 0.7); transform: translateX(-50%) rotate(2deg); }
+        .sticky-note:nth-child(3n) .tape { background-color: rgba(255, 183, 178, 0.7); }
+
+        /* 旋转一点点，显得自然 */
+        .sticky-note:nth-child(odd) { transform: rotate(-1deg); }
+        .sticky-note:nth-child(even) { transform: rotate(1deg); }
+
+        /* 悬浮加号 */
+        .fab {
+            position: fixed; bottom: 100px; right: 24px;
+            width: 50px; height: 50px; background: #FFF;
+            border-radius: 50%; box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: var(--text-main); border: 2px solid #F0F0F0;
+        }
+
+        /* ============ 通用弹窗 ============ */
+        .mask {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.6); backdrop-filter: blur(4px);
+            z-index: 200; display: none; align-items: flex-end;
+        }
+        .mask.show { display: flex; animation: fade 0.3s; }
+        .sheet {
+            width: 100%; background: #FFF; padding: 30px;
+            border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+            animation: slide 0.3s;
+        }
+        @keyframes slide { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        
+        /* 简单的Tag样式 */
+        .pill-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .pill {
+            padding: 8px 18px; border: 1px solid #EEE; border-radius: 20px;
+            font-size: 13px; color: #888;
+        }
+        .pill.active { background: var(--accent-pink); color: #FFF; border-color: var(--accent-pink); }
+
+    </style>
+</head>
+<body>
+
+    <div id="p-love" class="page active">
+        <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+            <div class="love-card">
+                <div class="days-big">102</div>
+                <div class="days-label">days with you</div>
+            </div>
+            <svg width="100" height="20" style="margin: 30px auto; display: block;">
+                <path d="M0,10 Q50,20 100,10" stroke="#E0E0E0" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <div id="p-cycle" class="page">
+        <div class="page-title">Her Cycle</div>
+        
+        <div class="cycle-container">
+            <div class="blob-bg"></div>
+            <div class="cycle-content">
+                <div class="cycle-day">D3</div>
+                <div class="cycle-status">经期中 · 请呵护</div>
+            </div>
+            <div class="date-trigger">
+                调整开始日
+                <input type="date" id="date-input" onchange="alert('周期已重置为: ' + this.value)">
+            </div>
+        </div>
+
+        <button class="btn-soft" onclick="openSheet('s-cycle')">
+            <span style="font-size: 18px;">🌡️</span> 记录今日感受
+        </button>
+    </div>
+
+    <div id="p-checkin" class="page">
+        <div class="page-title">Daily Journal</div>
+        
+        <div class="journal-card">
+            <div class="question-text">Q: 如果这周末我们可以去世界上任何一个地方，你想去哪里？</div>
+            
+            <textarea class="journal-input" placeholder="在这里写下你的想法..."></textarea>
+            
+            <div class="mood-section">
+                <div class="mood-title">TODAY'S MOOD</div>
+                <div class="mood-row">
+                    <div class="mood-opt" onclick="selMood(this)">
+                        <svg class="mood-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="#FFF9C4"/>
+                            <path d="M30 40 Q35 30 40 40 M60 40 Q65 30 70 40 M30 65 Q50 85 70 65" stroke="#FBC02D" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="mood-opt" onclick="selMood(this)">
+                        <svg class="mood-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="#E2F0CB"/>
+                            <circle cx="35" cy="40" r="5" fill="#7CB342"/>
+                            <circle cx="65" cy="40" r="5" fill="#7CB342"/>
+                            <line x1="35" y1="70" x2="65" y2="70" stroke="#7CB342" stroke-width="5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="mood-opt" onclick="selMood(this)">
+                        <svg class="mood-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="#E0F7FA"/>
+                            <path d="M30 45 L40 45 M60 45 L70 45 M35 75 Q50 60 65 75" stroke="#00ACC1" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="mood-opt" onclick="selMood(this)">
+                        <svg class="mood-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="#FFCCBC"/>
+                            <line x1="30" y1="35" x2="45" y2="45" stroke="#D84315" stroke-width="5" stroke-linecap="round"/>
+                            <line x1="70" y1="35" x2="55" y2="45" stroke="#D84315" stroke-width="5" stroke-linecap="round"/>
+                            <circle cx="35" cy="50" r="3" fill="#D84315"/>
+                            <circle cx="65" cy="50" r="3" fill="#D84315"/>
+                            <path d="M40 70 Q50 65 60 70" stroke="#D84315" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="btn-post" onclick="alert('日记已合上，等待对方书写...')">交换日记</button>
+    </div>
+
+    <div id="p-whisper" class="page">
+        <div class="page-title">Whispers</div>
+        <div class="waterfall" id="note-wall">
+            <div class="sticky-note">
+                <div class="tape"></div>
+                今天天气真好，记得想我。
+            </div>
+            <div class="sticky-note">
+                <div class="tape"></div>
+                下班顺路买点草莓吧？🍓
+            </div>
+            <div class="sticky-note">
+                <div class="tape"></div>
+                Secret...
+            </div>
+        </div>
+        <div class="fab" onclick="openSheet('s-note')">+</div>
+    </div>
+
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="go('p-love', this)">
+            <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div class="tab-item" onclick="go('p-cycle', this)">
+            <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><circle cx="12" cy="12" r="5"/></svg>
+        </div>
+        <div class="tab-item" onclick="go('p-checkin', this)">
+            <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </div>
+        <div class="tab-item" onclick="go('p-whisper', this)">
+            <svg class="tab-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></svg>
+        </div>
+    </div>
+
+    <div id="s-cycle" class="mask" onclick="closeSheet(this)">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0">Today's Feeling</h3>
+            <div class="pill-group">
+                <div class="pill" onclick="this.classList.toggle('active')">腰酸</div>
+                <div class="pill" onclick="this.classList.toggle('active')">痛感 Lv.1</div>
+                <div class="pill active" onclick="this.classList.toggle('active')">痛感 Lv.Max</div>
+                <div class="pill" onclick="this.classList.toggle('active')">想吃甜的</div>
+            </div>
+            <button class="btn-post" onclick="closeSheet(this.closest('.mask'))">保存记录</button>
+        </div>
+    </div>
+
+    <div id="s-note" class="mask" onclick="closeSheet(this)">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0">New Whisper</h3>
+            <textarea class="journal-input" id="note-txt" style="height:80px; background:#F9F9F9; padding:10px;" placeholder="写给TA..."></textarea>
+            <button class="btn-post" onclick="addNote()">贴到墙上</button>
+        </div>
+    </div>
+
+    <script>
+        // Tab 切换
+        function go(id, tab) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            tab.classList.add('active');
+        }
+
+        // 弹窗逻辑
+        function openSheet(id) { document.getElementById(id).classList.add('show'); }
+        function closeSheet(el) { el.classList.remove('show'); }
+
+        // 心情选择动画
+        function selMood(el) {
+            document.querySelectorAll('.mood-opt').forEach(m => m.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // 贴纸逻辑
+        function addNote() {
+            const txt = document.getElementById('note-txt').value;
+            if(!txt) return;
+            const wall = document.getElementById('note-wall');
+            const div = document.createElement('div');
+            div.className = 'sticky-note';
+            // 随机旋转一点点
+            div.style.transform = `rotate(${Math.random() * 4 - 2}deg)`;
+            div.innerHTML = `<div class="tape"></div>${txt}`;
+            wall.prepend(div);
+            document.getElementById('note-txt').value = '';
+            closeSheet(document.getElementById('s-note'));
+        }
+    </script>
+</body>
+</html>
