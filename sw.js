@@ -223,4 +223,20 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+
+  // 主页面请求 SW 代发通知（iOS PWA 必须走此通道）
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const d = event.data;
+    event.waitUntil(
+      self.registration.showNotification(d.title || '新消息', {
+        body: d.body || '',
+        icon: d.icon || 'https://i.postimg.cc/s2n0gxBB/appicon.png',
+        badge: 'https://i.postimg.cc/s2n0gxBB/appicon.png',
+        tag: d.tag || 'chat-msg',
+        renotify: true,
+        vibrate: [100, 50, 100],
+        data: { url: './' }
+      })
+    );
+  }
 });
