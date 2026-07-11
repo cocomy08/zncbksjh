@@ -144,8 +144,8 @@
                 }
             });
 
-            // 清理音频缓存
-            document.querySelectorAll('audio').forEach(audio => {
+            // 清理音频缓存（排除后台保活音频）
+            document.querySelectorAll('audio:not([data-bg-keepalive])').forEach(audio => {
                 audio.pause();
                 audio.src = '';
                 audio.load();
